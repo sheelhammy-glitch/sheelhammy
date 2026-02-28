@@ -1,0 +1,290 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model User {
+  id                String     @id @default(uuid())
+  name              String
+  email             String     @unique
+  password          String
+  phone             String?
+  phoneCountryCode  String?    @default("+962")
+  role              Role       @default(EMPLOYEE)
+  avatar            String?
+  isActive          Boolean    @default(true)
+  defaultProfitRate Float?
+  country           String?
+  specialization    String?
+  services          Json?      // Array of service IDs or names
+  academicLevels    Json?      // Array: دبلوم/بكالوريوس/ماجستير/دكتوراه
+  complaintsCount   Int        @default(0)
+  isReferrer        Boolean    @default(false) // هل هو مندوب
+  referrerCode      String?    @unique // كود المندوب للرابط
+  commissionRate    Float?     // نسبة العمولة للمندوب (%)
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  assignedJobs      Order[]    @relation("EmployeeOrders")
+  referredOrders    Order[]    @relation("ReferrerOrders")
+  transfers         Transfer[]
+
+  @@index([referrerCode], map: "User_referrerCode_idx")
+}
+
+model Student {
+  id              String   @id @default(uuid())
+  name            String
+  whatsapp        String?  @unique
+  phoneCountryCode String? @default("+962")
+  email           String?
+  country         String?
+  academicLevel   String?  // مدرسة - دبلوم - بكالوريس - ماجستير - دكتوراة
+  specialization String?
+  university      String?
+  notes           String?  @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  orders          Order[]
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  name      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  services  Service[]
+}
+
+model Service {
+  id             String   @id @default(uuid())
+  title          String
+  shortDescription String? @db.Text // وصف مختصر للكارد
+  description    String   @db.Text // وصف تفصيلي
+  image          String?
+  priceGuideline Float?
+  features       Json?
+  isActive       Boolean  @default(true) // مفعلة / مخفية
+  countries      Json?    // Array of country codes
+  categoryId     String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  orders         Order[]
+  category       Category @relation(fields: [categoryId], references: [id])
+
+  @@index([categoryId], map: "Service_categoryId_fkey")
+  @@index([isActive], map: "Service_isActive_idx")
+}
+
+model Testimonial {
+  id         String   @id @default(uuid())
+  clientName String
+  content    String   @db.Text
+  avatar     String?
+  rating     Int      @default(5)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model FAQ {
+  id        String   @id @default(uuid())
+  question  String
+  answer    String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Portfolio {
+  id            String   @id @default(uuid())
+  title         String
+  description   String?
+  image         String?
+  link          String?
+  file          String?  // ملف مرفوع
+  academicLevel String?  // تصنيف المرحلة الدراسية
+  date          DateTime? // تاريخ
+  countries     Json?    // Array of country codes
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Order {
+  id                  String         @id @default(uuid())
+  orderNumber         String         @unique
+  status              OrderStatus    @default(PENDING)
+  studentId           String
+  serviceId           String
+  employeeId          String?
+  referrerId          String?        // المندوب الذي جاب الطلب
+  referrerCommission  Float?         // عمولة المندوب على هذا الطلب
+  totalPrice          Float          @default(0)
+  employeeProfit      Float          @default(0)
+  isPaid              Boolean        @default(false)
+  paymentType         String?        // كاش / أقساط
+  paymentInstallments Json?          // Array of installment amounts
+  discount            Float          @default(0)
+  priority            String?         @default("normal") // normal / urgent
+  deadline            DateTime?
+  grade               String?        // P / M / D for BTEC, null for normal
+  gradeType           String?         // BTEC / normal
+  subjectName         String?
+  orderType           String?        // نوع الطلب
+  description         String?        @db.Text
+  revisionCount       Int            @default(0)
+  clientFiles         String?        @db.Text
+  workFiles           String?        @db.Text
+  revisionNotes       String?        @db.Text
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  notifications       Notification[]
+  paymentRecords      PaymentRecord[]
+  employee            User?          @relation("EmployeeOrders", fields: [employeeId], references: [id])
+  referrer            User?          @relation("ReferrerOrders", fields: [referrerId], references: [id])
+  service             Service        @relation(fields: [serviceId], references: [id])
+  student             Student        @relation(fields: [studentId], references: [id])
+
+  @@index([employeeId], map: "Order_employeeId_fkey")
+  @@index([referrerId], map: "Order_referrerId_fkey")
+  @@index([serviceId], map: "Order_serviceId_fkey")
+  @@index([studentId], map: "Order_studentId_fkey")
+  @@index([createdAt], map: "Order_createdAt_idx")
+  @@index([priority], map: "Order_priority_idx")
+}
+
+model Expense {
+  id          String   @id @default(uuid())
+  title       String
+  amount      Float
+  category    String?
+  date        DateTime @default(now())
+  description String?
+  properties  Json?    // خصائص إضافية
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PaymentRecord {
+  id            String   @id @default(uuid())
+  orderId       String
+  amount        Float
+  paymentType   String   // cash / installment
+  paidBy        String?  // من دفع
+  paymentDate   DateTime @default(now())
+  notes         String?  @db.Text
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  order         Order    @relation(fields: [orderId], references: [id])
+
+  @@index([orderId], map: "PaymentRecord_orderId_fkey")
+}
+
+model Transfer {
+  id           String   @id @default(uuid())
+  employeeId   String
+  amount       Float
+  status       String   @default("COMPLETED")
+  receiptImage String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  employee     User     @relation(fields: [employeeId], references: [id])
+
+  @@index([employeeId], map: "Transfer_employeeId_fkey")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  orderId   String?
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  order     Order?   @relation(fields: [orderId], references: [id])
+
+  @@index([orderId], map: "Notification_orderId_fkey")
+}
+
+model Settings {
+  id                        String   @id @default(uuid())
+  platformName              String   @default("شيل همي")
+  platformDescription       String   @db.Text
+  currency                  String   @default("JOD")
+  workingHoursStart         String   @default("09:00")
+  workingHoursEnd           String   @default("17:00")
+  defaultFreeRevisions      Int      @default(2)
+  cancellationPolicy        String?  @db.Text
+  quoteExpiryHours          Int      @default(48)
+  defaultEmployeeProfitRate Float    @default(40)
+  autoAssignOrders          Boolean  @default(false)
+  maxOrdersPerEmployee      Int      @default(10)
+  enable2FA                 Boolean  @default(false)
+  enableAuditLogs           Boolean  @default(true)
+  rateLimit                 Int      @default(100)
+  deadlineReminderHours     Int      @default(24)
+  emailNotifications        Boolean  @default(true)
+  smsNotifications          Boolean  @default(false)
+  whatsappNotifications     Boolean  @default(true)
+  smsApiKey                 String?  @db.Text
+  whatsappApiKey            String?  @db.Text
+  siteTitle                 String?  @db.Text
+  siteDescription           String?  @db.Text
+  siteKeywords              String?  @db.Text
+  contactEmail              String?
+  contactPhone              String?
+  platformFee               Float    @default(15)
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+}
+
+model PaymentMethod {
+  id        String   @id @default(uuid())
+  code      String   @unique
+  label     String
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Blog {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  excerpt     String?  @db.Text // ملخص المقال
+  content     String   @db.Text // محتوى المقال
+  image       String?  // صورة المقال
+  author      String?  // اسم الكاتب
+  isPublished Boolean  @default(false) // منشور / مسودة
+  publishedAt DateTime? // تاريخ النشر
+  views       Int      @default(0) // عدد المشاهدات
+  tags        Json?    // Array of tags
+  category    String?  // فئة المقال
+  seoTitle    String?  // SEO title
+  seoDescription String? @db.Text // SEO description
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([slug], map: "Blog_slug_idx")
+  @@index([isPublished], map: "Blog_isPublished_idx")
+  @@index([publishedAt], map: "Blog_publishedAt_idx")
+}
+
+enum Role {
+  ADMIN
+  EMPLOYEE
+}
+
+enum OrderStatus {
+  PENDING
+  QUOTED
+  PAID
+  ASSIGNED
+  IN_PROGRESS
+  DELIVERED
+  REVISION
+  COMPLETED
+  CANCELLED
+  OVERDUE
+}
