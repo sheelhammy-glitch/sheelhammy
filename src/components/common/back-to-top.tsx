@@ -26,7 +26,7 @@ export function BackToTop() {
     <button
       onClick={scrollToTop}
       aria-label="العودة إلى الأعلى"
-      className={`fixed bottom-6 right-6 z-50
+      className={`fixed bottom-6 cursor-pointer right-6 z-50
       w-10 h-10 flex items-center justify-center
       rounded-md
       bg-[#0056d2] text-white

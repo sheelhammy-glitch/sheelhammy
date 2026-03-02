@@ -17,7 +17,7 @@ const tajawal = Tajawal({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  return generateSEOMetadata({
+  const metadata = await generateSEOMetadata({
     description: "شيل همّي منصة عربية متخصصة في الخدمات الأكاديمية والطلابية، نقدم حل الأسايمنت، إعداد الأبحاث، مشاريع التخرج، والتدقيق اللغوي لكافة التخصصات في الوطن العربي بجودة عالية وسرية تامة.",
     keywords: [
       "خدمات أكاديمية",
@@ -51,7 +51,14 @@ export async function generateMetadata(): Promise<Metadata> {
       "Thesis Support",
       "Academic Editing"
     ],
-  });
+  }); 
+  return {
+    ...metadata,
+    verification: {
+      ...metadata.verification,
+      google: "kiHL19cBzEx2LEsLajkDSp1vZcBbLvUH7T6gg9F63JE",
+    },
+  };
 }
 
  
