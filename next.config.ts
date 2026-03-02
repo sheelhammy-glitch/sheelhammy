@@ -16,6 +16,20 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/index.html',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/index',
+        destination: '/',
+        permanent: true,
+      },
+    ];
+  },
   // compiler: {
   //   removeConsole: process.env.NODE_ENV === 'production',
   // },
