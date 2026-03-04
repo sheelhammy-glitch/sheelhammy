@@ -564,14 +564,14 @@ export function EmployeeForm({
                         <p className="text-xs font-semibold text-blue-900 mb-1">رابط المندوب:</p>
                         <div className="flex items-center gap-2">
                           <code className="text-xs bg-white px-2 py-1 rounded border border-blue-300 text-blue-700 flex-1 break-all">
-                            https://www.sheelhammy.com/ref/{formData.referrerCode}
+                            https://www.sheelhammy.com/contact-us?ref={formData.referrerCode}
                           </code>
                           <Button
                             type="button"
                             variant="outline"
                             size="sm"
                             onClick={() => {
-                              const link = `https://www.sheelhammy.com/ref/${formData.referrerCode}`;
+                              const link = `https://www.sheelhammy.com/contact-us?ref=${formData.referrerCode}`;
                               navigator.clipboard.writeText(link);
                               toast.success("تم نسخ الرابط");
                             }}
