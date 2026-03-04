@@ -182,8 +182,17 @@ function ContactFormContent() {
         }),
       });
 
+      // Check if response is JSON
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await response.text();
+        console.error("Non-JSON response:", text.substring(0, 200));
+        throw new Error("استجابة غير صحيحة من الخادم");
+      }
+
       if (!response.ok) {
-        throw new Error("فشل في حفظ الطلب");
+        const errorData = await response.json().catch(() => ({ error: "فشل في حفظ الطلب" }));
+        throw new Error(errorData.error || "فشل في حفظ الطلب");
       }
 
       const data = await response.json();

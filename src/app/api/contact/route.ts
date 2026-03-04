@@ -2,10 +2,22 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getWhatsAppLink } from "@/lib/countries";
 
+// Ensure this route runs in Node.js runtime (not Edge)
+export const runtime = "nodejs";
+
 // POST - Save contact request and notify referrer
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    // Ensure we return JSON even on errors
+    let body;
+    try {
+      body = await request.json();
+    } catch (parseError) {
+      return NextResponse.json(
+        { error: "طلب غير صحيح - يرجى التحقق من البيانات المرسلة" },
+        { status: 400 }
+      );
+    }
     const {
       name,
       email,
