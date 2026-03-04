@@ -560,9 +560,27 @@ export function EmployeeForm({
                       placeholder="مثال: ABC123"
                     />
                     {formData.referrerCode && (
-                      <p className="text-xs text-gray-500 mt-1">
-                        رابط المندوب: {typeof window !== "undefined" && `${window.location.origin}/ref/${formData.referrerCode}`}
-                      </p>
+                      <div className="mt-2 p-3 rounded-lg bg-blue-50 border border-blue-200">
+                        <p className="text-xs font-semibold text-blue-900 mb-1">رابط المندوب:</p>
+                        <div className="flex items-center gap-2">
+                          <code className="text-xs bg-white px-2 py-1 rounded border border-blue-300 text-blue-700 flex-1 break-all">
+                            https://www.sheelhammy.com/ref/{formData.referrerCode}
+                          </code>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const link = `https://www.sheelhammy.com/ref/${formData.referrerCode}`;
+                              navigator.clipboard.writeText(link);
+                              toast.success("تم نسخ الرابط");
+                            }}
+                            className="flex-shrink-0"
+                          >
+                            <Icon icon="solar:copy-bold" className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
                     )}
                   </div>
                   <div>

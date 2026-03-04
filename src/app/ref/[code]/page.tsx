@@ -1,88 +1,76 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { toast } from "sonner";
 import { Icon } from "@iconify/react";
-import { PageHero } from "@/components/common/page-hero";
 
 export default function ReferrerPage() {
   const params = useParams();
   const router = useRouter();
-  const code = params?.code as string;
-  const [isLoading, setIsLoading] = useState(true);
-  const [referrer, setReferrer] = useState<{
-    name: string;
-    code: string;
-  } | null>(null);
+  const [isValidating, setIsValidating] = useState(true);
+  const [isValid, setIsValid] = useState(false);
 
   useEffect(() => {
-    if (code) {
-      verifyReferrer();
+    const code = params?.code as string;
+    if (!code) {
+      router.push("/contact-us");
+      return;
     }
-  }, [code]);
 
-  const verifyReferrer = async () => {
-    try {
-      const response = await fetch(`/api/referrer/${code}`);
-      if (!response.ok) {
-        throw new Error("Invalid referrer code");
+    // Validate referrer code
+    const validateCode = async () => {
+      try {
+        const response = await fetch(`/api/referrer/${code}`);
+        if (response.ok) {
+          setIsValid(true);
+          // Redirect to contact-us with referrer code
+          router.push(`/contact-us?ref=${code}`);
+        } else {
+          setIsValid(false);
+          // Invalid code, redirect to contact-us without code
+          setTimeout(() => {
+            router.push("/contact-us");
+          }, 2000);
+        }
+      } catch (error) {
+        console.error("Error validating referrer code:", error);
+        setIsValid(false);
+        setTimeout(() => {
+          router.push("/contact-us");
+        }, 2000);
+      } finally {
+        setIsValidating(false);
       }
-      const data = await response.json();
-      setReferrer(data);
-      
-      // Save referrer code in localStorage
-      localStorage.setItem("referrerCode", code);
-      localStorage.setItem("referrerId", data.id);
-      
-      toast.success(`مرحباً بك من خلال ${data.name}`);
-      
-      // Redirect to home after 2 seconds
-      setTimeout(() => {
-        router.push("/");
-      }, 2000);
-    } catch (error) {
-      toast.error("كود المندوب غير صحيح");
-      router.push("/");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
 
-  if (isLoading) {
+    validateCode();
+  }, [params, router]);
+
+  if (isValidating) {
     return (
-      <main>
-        <div className="container mx-auto px-4 py-20 text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">جاري التحقق من كود المندوب...</p>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50" dir="rtl">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">جاري التحقق من الرابط...</p>
         </div>
-      </main>
+      </div>
     );
   }
 
-  if (!referrer) {
-    return null;
+  if (!isValid) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50" dir="rtl">
+        <div className="text-center max-w-md mx-auto px-4">
+          <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+            <Icon icon="solar:close-circle-bold" className="w-10 h-10 text-red-600" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">رابط غير صحيح</h1>
+          <p className="text-gray-600 mb-4">الرابط الذي تحاول الوصول إليه غير صحيح أو منتهي الصلاحية.</p>
+          <p className="text-sm text-gray-500">سيتم توجيهك إلى صفحة التواصل...</p>
+        </div>
+      </div>
+    );
   }
 
-  return (
-    <main>
-      <PageHero
-        title={`مرحباً بك من خلال ${referrer.name}`}
-        description="سيتم توجيهك إلى الصفحة الرئيسية..."
-        badge="رابط المندوب"
-        badgeIcon="solar:user-id-bold"
-      />
-      <section dir="rtl" className="py-20">
-        <div className="container mx-auto px-4 text-center">
-          <Icon
-            icon="solar:check-circle-bold"
-            className="w-16 h-16 mx-auto text-green-600 mb-4"
-          />
-          <p className="text-lg text-gray-600">
-            تم حفظ رابط المندوب بنجاح. سيتم ربط طلباتك بهذا المندوب.
-          </p>
-        </div>
-      </section>
-    </main>
-  );
+  return null;
 }

@@ -1,9 +1,11 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 
 const WHATSAPP_NUMBER = "962781858647";
 const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}`;
@@ -49,6 +51,10 @@ type FormData = {
 };
 
 export function ContactForm() {
+  const searchParams = useSearchParams();
+  const [referrerCode, setReferrerCode] = useState<string | null>(null);
+  const [referrerInfo, setReferrerInfo] = useState<{ name: string; code: string } | null>(null);
+
   const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",
@@ -67,6 +73,25 @@ export function ContactForm() {
     urgency: "normal",
     filesLink: "",
   });
+
+  // Get referrer code from URL
+  useEffect(() => {
+    const ref = searchParams?.get("ref");
+    if (ref) {
+      setReferrerCode(ref);
+      // Fetch referrer info
+      fetch(`/api/referrer/${ref}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.name && data.referrerCode) {
+            setReferrerInfo({ name: data.name, code: data.referrerCode });
+          }
+        })
+        .catch((err) => {
+          console.error("Error fetching referrer info:", err);
+        });
+    }
+  }, [searchParams]);
 
   const fullPhone = useMemo(() => {
     const local = (formData.phoneLocal || "").trim().replace(/\s+/g, "");
@@ -128,38 +153,82 @@ export function ContactForm() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // رسالة منظمة ومنسقة للواتساب
-    const message = `🎓 *طلب خدمة أكاديمية*\n\n` +
-      `━━━━━━━━━━━━━━━━━━━━\n` +
-      `👤 *معلومات التواصل*\n` +
-      `━━━━━━━━━━━━━━━━━━━━\n` +
-      `الاسم: ${formData.name}\n` +
-      `${formData.email ? `البريد الإلكتروني: ${formData.email}\n` : ''}` +
-      `رقم الهاتف: ${fullPhone}\n\n` +
-      `━━━━━━━━━━━━━━━━━━━━\n` +
-      `📋 *تفاصيل الطلب*\n` +
-      `━━━━━━━━━━━━━━━━━━━━\n` +
-      `نوع الخدمة: ${serviceLabel}\n` +
-      `المرحلة الدراسية: ${academicLevelLabel}\n` +
-      `${formData.university ? `الجامعة/المدرسة: ${formData.university}\n` : ''}` +
-      `${formData.subject ? `المادة/التخصص: ${formData.subject}\n` : ''}` +
-      `${formData.deadline ? `موعد التسليم: ${formatDeadlineForWhatsApp(formData.deadline)}\n` : ''}` +
-      `${formData.pagesOrWords ? `نوع المخرجات: ${formData.pagesOrWords === 'word' ? 'ملف Word' : formData.pagesOrWords === 'pdf' ? 'ملف PDF' : formData.pagesOrWords === 'ppt' ? 'PowerPoint' : formData.pagesOrWords === 'both_word_pdf' ? 'Word + PDF' : formData.pagesOrWords}\n` : ''}` +
-      `اللغة: ${languageLabel}\n` +
-      `الاستعجال: ${urgencyLabel === 'normal' ? 'عادي' : urgencyLabel === 'urgent' ? '🚨 مستعجل' : '⚡ مستعجل جداً'}\n` +
-      `${formData.filesLink ? `رابط الملفات: ${formData.filesLink}\n` : ''}\n` +
-      `━━━━━━━━━━━━━━━━━━━━\n` +
-      `💬 *الرسالة*\n` +
-      `━━━━━━━━━━━━━━━━━━━━\n` +
-      `${formData.message}\n\n` +
-      `━━━━━━━━━━━━━━━━━━━━\n` +
-      `✅ تم إرسال الطلب عبر الموقع`;
+    // Save contact request and send WhatsApp to referrer if exists
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: fullPhone,
+          service: formData.service,
+          message: formData.message,
+          academicLevel: formData.academicLevel,
+          subject: formData.subject,
+          university: formData.university,
+          deadline: formData.deadline,
+          pagesOrWords: formData.pagesOrWords,
+          language: formData.language,
+          urgency: formData.urgency,
+          filesLink: formData.filesLink,
+          referrerCode: referrerCode,
+        }),
+      });
 
-    const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappLink, "_blank");
+      if (!response.ok) {
+        throw new Error("فشل في حفظ الطلب");
+      }
+
+      const data = await response.json();
+      
+      // رسالة منظمة ومنسقة للواتساب
+      const message = `🎓 *طلب خدمة أكاديمية*\n\n` +
+        `━━━━━━━━━━━━━━━━━━━━\n` +
+        `👤 *معلومات التواصل*\n` +
+        `━━━━━━━━━━━━━━━━━━━━\n` +
+        `الاسم: ${formData.name}\n` +
+        `${formData.email ? `البريد الإلكتروني: ${formData.email}\n` : ''}` +
+        `رقم الهاتف: ${fullPhone}\n` +
+        `${referrerInfo ? `المندوب: ${referrerInfo.name} (${referrerInfo.code})\n` : ''}\n` +
+        `━━━━━━━━━━━━━━━━━━━━\n` +
+        `📋 *تفاصيل الطلب*\n` +
+        `━━━━━━━━━━━━━━━━━━━━\n` +
+        `نوع الخدمة: ${serviceLabel}\n` +
+        `المرحلة الدراسية: ${academicLevelLabel}\n` +
+        `${formData.university ? `الجامعة/المدرسة: ${formData.university}\n` : ''}` +
+        `${formData.subject ? `المادة/التخصص: ${formData.subject}\n` : ''}` +
+        `${formData.deadline ? `موعد التسليم: ${formatDeadlineForWhatsApp(formData.deadline)}\n` : ''}` +
+        `${formData.pagesOrWords ? `نوع المخرجات: ${formData.pagesOrWords === 'word' ? 'ملف Word' : formData.pagesOrWords === 'pdf' ? 'ملف PDF' : formData.pagesOrWords === 'ppt' ? 'PowerPoint' : formData.pagesOrWords === 'both_word_pdf' ? 'Word + PDF' : formData.pagesOrWords}\n` : ''}` +
+        `اللغة: ${languageLabel}\n` +
+        `الاستعجال: ${urgencyLabel === 'normal' ? 'عادي' : urgencyLabel === 'urgent' ? '🚨 مستعجل' : '⚡ مستعجل جداً'}\n` +
+        `${formData.filesLink ? `رابط الملفات: ${formData.filesLink}\n` : ''}\n` +
+        `━━━━━━━━━━━━━━━━━━━━\n` +
+        `💬 *الرسالة*\n` +
+        `━━━━━━━━━━━━━━━━━━━━\n` +
+        `${formData.message}\n\n` +
+        `━━━━━━━━━━━━━━━━━━━━\n` +
+        `✅ تم إرسال الطلب عبر الموقع`;
+
+      const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+      window.open(whatsappLink, "_blank");
+
+      // Send WhatsApp to referrer if exists
+      if (data.referrer && data.referrer.whatsappLink) {
+        setTimeout(() => {
+          window.open(data.referrer.whatsappLink, "_blank");
+          toast.success(`تم إرسال إشعار للمندوب: ${data.referrer.name}`);
+        }, 500);
+      }
+    } catch (error: any) {
+      console.error("Error submitting contact form:", error);
+      toast.error(error.message || "حدث خطأ أثناء إرسال الطلب");
+    }
   };
 
   const handleChange = (
@@ -371,6 +440,14 @@ export function ContactForm() {
               <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">
                 املأ المعلومات أدناه — وسيفتح واتساب برسالة جاهزة ومنظمة بكل التفاصيل
               </p>
+              {referrerInfo && (
+                <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                  <Icon icon="solar:user-check-bold" className="w-4 h-4 text-green-600 dark:text-green-400" />
+                  <span className="text-sm font-semibold text-green-700 dark:text-green-300">
+                    تمت الإحالة من: {referrerInfo.name}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* name/email */}
