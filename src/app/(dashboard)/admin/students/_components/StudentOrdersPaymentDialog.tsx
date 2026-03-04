@@ -88,15 +88,17 @@ export function StudentOrdersPaymentDialog({
       const data = await response.json();
       
       // Orders already include paymentRecords from API
-      setOrders(data.orders || []);
+      const ordersData = data.orders || [];
+      setOrders(ordersData);
+      
       // Select all unpaid orders by default
-      const unpaidOrders = ordersWithPayments
-        .filter((order) => {
+      const unpaidOrders = ordersData
+        .filter((order: OrderDetail) => {
           const total = order.totalPrice - (order.discount || 0);
           const paid = (order.paymentRecords || []).reduce((sum: number, pr: any) => sum + pr.amount, 0);
           return paid < total;
         })
-        .map((order) => order.id);
+        .map((order: OrderDetail) => order.id);
       setSelectedOrders(new Set(unpaidOrders));
     } catch (error) {
       toast.error("حدث خطأ أثناء تحميل طلبات الطالب");
