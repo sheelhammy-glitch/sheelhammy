@@ -24,6 +24,8 @@ import { Employee } from "./EmployeeTable";
 import { toast } from "sonner";
 import { Icon } from "@iconify/react";
 import { ARAB_COUNTRIES, ACADEMIC_LEVELS, getWhatsAppLink } from "@/lib/countries";
+import { Role } from "@prisma/client";
+import { ADMIN_PAGES, getPagesByCategory } from "@/lib/rbac/permissions";
 
 interface EmployeeFormProps {
   open: boolean;
@@ -46,6 +48,7 @@ export function EmployeeForm({
     phone: employee?.phone || "",
     phoneCountryCode: (employee as any)?.phoneCountryCode || "+962",
     password: "",
+    role: (employee as any)?.role || ("EMPLOYEE" as Role),
     defaultProfitRate: (employee as any)?.defaultProfitRate || null,
     country: (employee as any)?.country || "",
     specialization: (employee as any)?.specialization || "",
@@ -54,6 +57,7 @@ export function EmployeeForm({
     isReferrer: (employee as any)?.isReferrer || false,
     referrerCode: (employee as any)?.referrerCode || "",
     commissionRate: (employee as any)?.commissionRate || null,
+    permissions: [] as string[],
   });
 
   useEffect(() => {
@@ -82,9 +86,11 @@ export function EmployeeForm({
             servicesArray = emp.services;
           } else if (typeof emp.services === 'string') {
             try {
-              servicesArray = JSON.parse(emp.services);
+              const parsed = JSON.parse(emp.services);
+              servicesArray = Array.isArray(parsed) ? parsed : [];
             } catch {
-              servicesArray = [];
+              // If JSON parse fails, treat as comma-separated string
+              servicesArray = emp.services.split(',').map((s: string) => s.trim()).filter((s: string) => s.length > 0);
             }
           }
         }
@@ -102,12 +108,27 @@ export function EmployeeForm({
           }
         }
 
+        let permissionsArray: string[] = [];
+        if (emp.permissions) {
+          if (Array.isArray(emp.permissions)) {
+            permissionsArray = emp.permissions;
+          } else if (typeof emp.permissions === 'string') {
+            try {
+              const parsed = JSON.parse(emp.permissions);
+              permissionsArray = Array.isArray(parsed) ? parsed : [];
+            } catch {
+              permissionsArray = [];
+            }
+          }
+        }
+
         setFormData({
           name: employee.name || "",
           email: employee.email || "",
           phone: employee.phone || "",
           phoneCountryCode: emp.phoneCountryCode || "+962",
           password: "",
+          role: emp.role || ("EMPLOYEE" as Role),
           defaultProfitRate: emp.defaultProfitRate ?? null,
           country: emp.country || "",
           specialization: emp.specialization || "",
@@ -116,6 +137,7 @@ export function EmployeeForm({
           isReferrer: emp.isReferrer || false,
           referrerCode: emp.referrerCode || "",
           commissionRate: emp.commissionRate ?? null,
+          permissions: permissionsArray,
         });
       } else {
         setFormData({
@@ -124,6 +146,7 @@ export function EmployeeForm({
           phone: "",
           phoneCountryCode: "+962",
           password: "",
+          role: "EMPLOYEE" as Role,
           defaultProfitRate: null,
           country: "",
           specialization: "",
@@ -132,6 +155,7 @@ export function EmployeeForm({
           isReferrer: false,
           referrerCode: "",
           commissionRate: null,
+          permissions: [],
         });
       }
     }
@@ -163,6 +187,7 @@ export function EmployeeForm({
         email: formData.email,
         phone: formData.phone || null,
         phoneCountryCode: formData.phoneCountryCode,
+        role: formData.role,
         defaultProfitRate: formData.defaultProfitRate || null,
         country: formData.country || null,
         specialization: formData.specialization || null,
@@ -171,6 +196,7 @@ export function EmployeeForm({
         isReferrer: formData.isReferrer,
         referrerCode: referrerCode || null,
         commissionRate: formData.isReferrer ? (formData.commissionRate || null) : null,
+        permissions: formData.role === "ADMIN" && formData.permissions.length > 0 ? formData.permissions : null,
       };
 
       if (!employee && !formData.password) {
@@ -314,6 +340,85 @@ export function EmployeeForm({
               </div>
             )}
             <div>
+              <Label>الدور</Label>
+              <Select
+                value={formData.role}
+                onValueChange={(value) =>
+                  setFormData({ 
+                    ...formData, 
+                    role: value as Role,
+                    // إذا تم تغيير الدور إلى EMPLOYEE، امسح الصلاحيات
+                    permissions: value === "EMPLOYEE" ? [] : formData.permissions,
+                  })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="EMPLOYEE">موظف</SelectItem>
+                  <SelectItem value="ADMIN">مدير</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-500 mt-1">
+                {formData.role === "EMPLOYEE" 
+                  ? "الموظف يفتح له dashboard الموظف فقط"
+                  : "يمكنك تحديد الصفحات التي يمكن للمدير الوصول إليها أدناه (إذا تركت فارغاً، سيكون لديه صلاحيات كاملة)"}
+              </p>
+            </div>
+            {formData.role === "ADMIN" && (
+              <div className="border-t pt-4">
+                <h3 className="font-semibold mb-4">الصلاحيات</h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  اختر الصفحات التي يمكن للموظف الوصول إليها:
+                </p>
+                <div className="space-y-4">
+                  {Object.entries(getPagesByCategory()).map(([category, pages]) => (
+                    <div key={category}>
+                      <h4 className="font-medium text-sm mb-2 text-gray-700 dark:text-gray-300">
+                        {category}
+                      </h4>
+                      <div className="space-y-2 pr-4">
+                        {pages.map((page) => (
+                          <div key={page.path} className="flex items-center space-x-2 space-x-reverse">
+                            <input
+                              type="checkbox"
+                              id={`permission-${page.path}`}
+                              checked={formData.permissions.includes(page.path)}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setFormData({
+                                    ...formData,
+                                    permissions: [...formData.permissions, page.path],
+                                  });
+                                } else {
+                                  setFormData({
+                                    ...formData,
+                                    permissions: formData.permissions.filter(
+                                      (p) => p !== page.path
+                                    ),
+                                  });
+                                }
+                              }}
+                              className="rounded"
+                            />
+                            <Label htmlFor={`permission-${page.path}`} className="cursor-pointer text-sm">
+                              {page.label}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {formData.permissions.length > 0 && (
+                  <p className="text-xs text-gray-500 mt-3">
+                    عدد الصفحات المحددة: {formData.permissions.length} من {ADMIN_PAGES.length}
+                  </p>
+                )}
+              </div>
+            )}
+            <div>
               <Label>نسبة الربح الافتراضية (%) (اختياري)</Label>
               <Input
                 type="number"
@@ -361,57 +466,30 @@ export function EmployeeForm({
             </div>
             <div>
               <Label>الخدمات التي يشتغلها</Label>
-              <Select
-                value=""
-                onValueChange={(value) => {
-                  if (!formData.services.includes(value)) {
-                    setFormData({
-                      ...formData,
-                      services: [...formData.services, value],
-                    });
-                  }
+              <Textarea
+                value={Array.isArray(formData.services) ? formData.services.filter(s => s).join(", ") : ""}
+                onChange={(e) => {
+                  const value = e.target.value; 
+                  const servicesList = value
+                    .split(/[,\n]/)
+                    .map((s) => s.trim())
+                    .filter((s) => s.length > 0);
+                  setFormData({
+                    ...formData,
+                    services: servicesList,
+                  });
                 }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="اختر خدمة" />
-                </SelectTrigger>
-                <SelectContent>
-                  {services
-                    .filter((s) => !formData.services.includes(s.id))
-                    .map((service) => (
-                      <SelectItem key={service.id} value={service.id}>
-                        {service.title}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-              {formData.services.length > 0 && (
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {formData.services.map((serviceId) => {
-                    const service = services.find((s) => s.id === serviceId);
-                    return (
-                      <span
-                        key={serviceId}
-                        className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 rounded-md text-sm"
-                      >
-                        {service?.title || serviceId}
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setFormData({
-                              ...formData,
-                              services: formData.services.filter(
-                                (id) => id !== serviceId
-                              ),
-                            })
-                          }
-                          className="ml-1 hover:text-red-600"
-                        >
-                          ×
-                        </button>
-                      </span>
-                    );
-                  })}
+                placeholder="أدخل الخدمات مفصولة بفواصل أو أسطر، مثال: حل أسايمنت، إعداد أبحاث، مشاريع تخرج"
+                rows={3}
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                يمكنك إدخال عدة خدمات مفصولة بفواصل (،) أو أسطر جديدة
+              </p>
+              {Array.isArray(formData.services) && formData.services.filter(s => s).length > 0 && (
+                <div className="mt-2">
+                  <p className="text-sm text-gray-600 mb-2">
+                    عدد الخدمات: {formData.services.filter(s => s).length}
+                  </p>
                 </div>
               )}
             </div>

@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, email, password, phone, phoneCountryCode, defaultProfitRate, country, specialization, services, academicLevels, isReferrer, referrerCode, commissionRate } = body;
+    const { name, email, password, phone, phoneCountryCode, role, defaultProfitRate, country, specialization, services, academicLevels, isReferrer, referrerCode, commissionRate, permissions } = body;
 
     if (!name || !email || !password) {
       return NextResponse.json(
@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
         password: hashedPassword,
         phone: phone || null,
         phoneCountryCode: phoneCountryCode || "+962",
-        role: Role.EMPLOYEE,
+        role: role || Role.EMPLOYEE,
         isActive: true,
         defaultProfitRate: defaultProfitRate || null,
         country: country || null,
@@ -160,6 +160,7 @@ export async function POST(request: NextRequest) {
         isReferrer: isReferrer || false,
         referrerCode: isReferrer ? (referrerCode || null) : null,
         commissionRate: isReferrer ? (commissionRate || null) : null,
+        permissions: (role === Role.ADMIN && permissions && permissions.length > 0) ? permissions : null,
       },
     });
 

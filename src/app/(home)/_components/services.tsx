@@ -142,8 +142,7 @@ export function ServicesSection() {
             نوفر لك مساعدة أكاديمية شاملة بمعايير موثوقة وتسليم منظم وتجربة تواصل سهلة.
           </p>
         </div>
-
-        {/* سكيليتون */}
+ 
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7 mb-14">
             {[1, 2, 3].map((i) => (
@@ -174,8 +173,8 @@ export function ServicesSection() {
                     hover:shadow-[0_16px_48px_rgba(0,86,210,0.14)]
                     transition-all duration-500 hover:-translate-y-1"
                 >
-                  {/* صورة الكارد */}
-                  <div className="relative h-52 w-full overflow-hidden bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+               
+                  <div className="relative h-44 w-full overflow-hidden bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
                     <Image
                       src={service.image || DEFAULT_IMAGE}
                       alt={service.title}
@@ -185,7 +184,7 @@ export function ServicesSection() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-white/80 via-white/25 to-transparent pointer-events-none" />
 
-                    {/* شارة الفئة */}
+                 
                     {service.category?.name && (
                       <div
                         className="absolute top-4 right-4 z-10 flex items-center gap-2 px-3 py-1.5 rounded-xl border shadow-sm"
@@ -198,33 +197,20 @@ export function ServicesSection() {
                         <span className="w-1.5 h-1.5 rounded-full" style={{ background: PRIMARY }} />
                         <span className="text-xs font-extrabold text-gray-900">{service.category.name}</span>
                       </div>
-                    )}
-
-                    {/* رقم الخدمة */}
-                    <div
-                      className="absolute top-4 left-4 z-10 w-9 h-9 rounded-2xl flex items-center justify-center shadow-md"
-                      style={{
-                        background: `linear-gradient(135deg, ${PRIMARY}, #0047b3)`,
-                        border: `1px solid ${PRIMARY}30`,
-                      }}
-                    >
-                      <span className="text-xs font-black text-white">{String(index + 1).padStart(2, "0")}</span>
-                    </div>
-
-                    {/* عنوان فوق الصورة */}
-                    <div className="absolute bottom-0 inset-x-0 z-10 p-5">
-                      <p className="text-xs font-extrabold mb-1" style={{ color: PRIMARY }}>
+                    )} 
+              
+         
+                  </div>
+ 
+                  <div className="flex-1 flex flex-col px-2 py-2 gap-4">
+                 
+                      <p className="text-xs font-extrabold " style={{ color: PRIMARY }}>
                         {service.category?.name ?? "خدمة أكاديمية"}
                       </p>
                       <h3 className="text-xl font-extrabold text-black leading-tight line-clamp-2">{service.title}</h3>
-                    </div>
-                  </div>
-
-                  {/* بودي الكارد */}
-                  <div className="flex-1 flex flex-col p-5 gap-4">
+                   
                     <p className="text-sm text-gray-500 leading-relaxed line-clamp-2">{service.description}</p>
-
-                    {/* Features: حجم أصغر + 2 بجانب بعض */}
+ 
                     <div className="grid grid-cols-2 gap-x-3 gap-y-2">
                       {features.slice(0, 4).map((feat, fi) => (
                         <div key={fi} className="flex items-start gap-2">
@@ -240,8 +226,7 @@ export function ServicesSection() {
                     </div>
 
                     <div className="border-t border-gray-100 mt-auto" />
-
-                    {/* الأزرار */}
+ 
                     <div className="flex items-center gap-2.5">
                       <Link
                         href="/contact-us"
@@ -292,8 +277,7 @@ export function ServicesSection() {
             })}
           </div>
         )}
-
-        {/* زر المزيد من الخدمات (أقصر ارتفاع) */}
+ 
         <div className="flex justify-center">
           <Link
             href="/services"
@@ -324,8 +308,8 @@ export function ServicesSection() {
       </div>
 
       {/* MODAL */}
-      <DetailsMoldals open={openIndex !== null} title={activeService?.title ?? ""} onClose={() => setOpenIndex(null)}>
-        {activeService && modalData ? (
+      {openIndex !== null && activeService && modalData && (
+        <DetailsMoldals open={true} title={activeService.title} onClose={() => setOpenIndex(null)}>
           <div dir="rtl" className="space-y-4 py-1">
             {(activeService.shortDescription || !activeService.detailedDescription) && (
               <ModalBlock icon="solar:stars-bold" label="ملخّص سريع">
@@ -394,8 +378,8 @@ export function ServicesSection() {
               <p className="text-sm text-gray-600 leading-relaxed pt-1">{modalData.note}</p>
             </div>
           </div>
-        ) : null}
-      </DetailsMoldals>
+        </DetailsMoldals>
+      )}
     </section>
   );
 }

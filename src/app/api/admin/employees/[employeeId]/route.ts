@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/config";
 import { prisma } from "@/lib/db";
+import { Role } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 // GET - Get single employee
@@ -93,7 +94,7 @@ export async function PATCH(
     const { employeeId } = await params;
     const body = await request.json();
 
-    const { name, email, phone, phoneCountryCode, defaultProfitRate, isActive, country, specialization, services, academicLevels, isReferrer, referrerCode, commissionRate } = body;
+    const { name, email, phone, phoneCountryCode, role, defaultProfitRate, isActive, country, specialization, services, academicLevels, isReferrer, referrerCode, commissionRate, permissions } = body;
 
     // Generate referrer code if isReferrer is true and code is empty
     let finalReferrerCode = referrerCode;
@@ -118,12 +119,29 @@ export async function PATCH(
     if (email !== undefined) userUpdateData.email = email;
     if (phone !== undefined) userUpdateData.phone = phone;
     if (phoneCountryCode !== undefined) userUpdateData.phoneCountryCode = phoneCountryCode;
+    if (role !== undefined) {
+      userUpdateData.role = role;
+      // إذا تم تغيير الدور إلى EMPLOYEE، امسح الصلاحيات
+      if (role === Role.EMPLOYEE) {
+        userUpdateData.permissions = null;
+      }
+    }
     if (defaultProfitRate !== undefined) userUpdateData.defaultProfitRate = defaultProfitRate || null;
     if (isActive !== undefined) userUpdateData.isActive = isActive;
     if (country !== undefined) userUpdateData.country = country || null;
     if (specialization !== undefined) userUpdateData.specialization = specialization || null;
     if (services !== undefined) userUpdateData.services = services || null;
     if (academicLevels !== undefined) userUpdateData.academicLevels = academicLevels || null;
+    if (permissions !== undefined) {
+      // الصلاحيات فقط للمديرين (ADMIN)
+      const currentUser = await prisma.user.findUnique({
+        where: { id: employeeId },
+        select: { role: true },
+      });
+      if (currentUser?.role === Role.ADMIN || role === Role.ADMIN) {
+        userUpdateData.permissions = (permissions && permissions.length > 0) ? permissions : null;
+      }
+    }
     if (isReferrer !== undefined) {
       userUpdateData.isReferrer = isReferrer;
       userUpdateData.referrerCode = isReferrer ? (finalReferrerCode || null) : null;

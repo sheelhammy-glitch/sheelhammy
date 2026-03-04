@@ -49,7 +49,8 @@ export async function middleware(request: NextRequest) {
   }
  
   const role = token.role as Role;
-  if (!canAccessRoute(role, pathname)) {
+  const permissions = (token.permissions as string[] | null | undefined) || null;
+  if (!canAccessRoute(role, pathname, permissions)) {
     const redirectPath = getRedirectPath(role);
     return NextResponse.redirect(new URL(redirectPath, request.url));
   }

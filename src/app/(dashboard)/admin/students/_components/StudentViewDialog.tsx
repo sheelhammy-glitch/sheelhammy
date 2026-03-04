@@ -15,6 +15,7 @@ import { Loader2 } from "lucide-react";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { StudentOrdersPaymentDialog } from "./StudentOrdersPaymentDialog";
 
 type StudentDetail = {
   id: string;
@@ -49,6 +50,7 @@ export function StudentViewDialog({
 }: StudentViewDialogProps) {
   const [studentDetail, setStudentDetail] = useState<StudentDetail | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
 
   useEffect(() => {
     if (open && student) {
@@ -160,10 +162,17 @@ export function StudentViewDialog({
             {studentDetail.orders.length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle>الطلبات</CardTitle>
-                  <CardDescription>
-                    آخر {Math.min(10, studentDetail.orders.length)} طلب
-                  </CardDescription>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle>الطلبات</CardTitle>
+                      <CardDescription>
+                        آخر {Math.min(10, studentDetail.orders.length)} طلب
+                      </CardDescription>
+                    </div>
+                    <Button onClick={() => setShowPaymentDialog(true)}>
+                      إدارة الدفعات
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
@@ -206,6 +215,15 @@ export function StudentViewDialog({
           </div>
         )}
       </DialogContent>
+
+      <StudentOrdersPaymentDialog
+        open={showPaymentDialog}
+        onOpenChange={setShowPaymentDialog}
+        student={student}
+        onSuccess={() => {
+          fetchStudentDetail();
+        }}
+      />
     </Dialog>
   );
 }

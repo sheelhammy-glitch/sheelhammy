@@ -21,7 +21,22 @@ export async function GET(
         orders: {
           include: {
             service: true,
-            employee: true,
+            employee: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            paymentRecords: {
+              select: {
+                id: true,
+                amount: true,
+                paymentDate: true,
+              },
+              orderBy: {
+                paymentDate: "desc",
+              },
+            },
           },
           orderBy: {
             createdAt: "desc",

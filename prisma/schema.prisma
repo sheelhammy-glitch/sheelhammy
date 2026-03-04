@@ -26,6 +26,7 @@ model User {
   isReferrer        Boolean    @default(false) // هل هو مندوب
   referrerCode      String?    @unique // كود المندوب للرابط
   commissionRate    Float?     // نسبة العمولة للمندوب (%)
+  permissions       Json?       
   createdAt         DateTime   @default(now())
   updatedAt         DateTime   @updatedAt
   assignedJobs      Order[]    @relation("EmployeeOrders")

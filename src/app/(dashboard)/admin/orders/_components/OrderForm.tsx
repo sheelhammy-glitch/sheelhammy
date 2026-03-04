@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 import { Order } from "./OrderTable";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
@@ -82,6 +83,8 @@ export function OrderForm({
     subjectName: "",
     orderType: "",
     description: "",
+    paidAmount: "", // المبلغ المدفوع
+    installmentAmount: "", // قيمة القسط الواحد
   });
 
   useEffect(() => {
@@ -112,6 +115,8 @@ export function OrderForm({
         subjectName: "",
         orderType: "",
         description: "",
+        paidAmount: "",
+        installmentAmount: "",
       });
     }
   }, [order, open]);
@@ -141,6 +146,10 @@ export function OrderForm({
         }
       }
 
+      // Calculate paid amount from installments if available
+      const totalPaid = installments.length > 0 ? installments.reduce((a, b) => a + b, 0) : 0;
+      const originalTotal = orderData.totalPrice || 0;
+      
       setFormData({
         studentId: orderData.studentId || "",
         serviceId: orderData.serviceId || "",
@@ -160,6 +169,8 @@ export function OrderForm({
         subjectName: orderData.subjectName || "",
         orderType: orderData.orderType || "",
         description: orderData.description || "",
+        paidAmount: totalPaid > 0 ? totalPaid.toString() : "",
+        installmentAmount: installments.length > 0 && installments[0] > 0 ? installments[0].toString() : "",
       });
     } catch (error) {
       console.error("Error fetching order data:", error);
@@ -278,45 +289,37 @@ export function OrderForm({
               <>
                 <div>
                   <Label>الطالب</Label>
-                  <Select
+                  <Combobox
+                    options={students.map((student) => ({
+                      value: student.id,
+                      label: student.name,
+                    }))}
                     value={formData.studentId}
                     onValueChange={(value) =>
                       setFormData({ ...formData, studentId: value })
                     }
+                    placeholder="اختر الطالب"
+                    searchPlaceholder="ابحث عن طالب..."
+                    emptyText="لا يوجد طلاب"
                     required
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="اختر الطالب" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {students.map((student) => (
-                        <SelectItem key={student.id} value={student.id}>
-                          {student.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  />
                 </div>
                 <div>
                   <Label>الخدمة</Label>
-                  <Select
+                  <Combobox
+                    options={services.map((service) => ({
+                      value: service.id,
+                      label: service.title,
+                    }))}
                     value={formData.serviceId}
                     onValueChange={(value) =>
                       setFormData({ ...formData, serviceId: value })
                     }
+                    placeholder="اختر الخدمة"
+                    searchPlaceholder="ابحث عن خدمة..."
+                    emptyText="لا توجد خدمات"
                     required
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="اختر الخدمة" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {services.map((service) => (
-                        <SelectItem key={service.id} value={service.id}>
-                          {service.title}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -393,23 +396,125 @@ export function OrderForm({
                   </Select>
                 </div>
                 {formData.paymentType === "installments" && (
-                  <div>
-                    <Label>الأقساط (مثال: 500, 100, 400)</Label>
-                    <Input
-                      placeholder="500, 100, 400"
-                      value={formData.paymentInstallments.join(", ")}
-                      onChange={(e) => {
-                        const values = e.target.value
-                          .split(",")
-                          .map((v) => parseFloat(v.trim()))
-                          .filter((v) => !isNaN(v));
-                        setFormData({ ...formData, paymentInstallments: values });
-                      }}
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      المجموع: {formData.paymentInstallments.reduce((a, b) => a + b, 0).toFixed(2)} د.أ
-                    </p>
-                  </div>
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label>المبلغ المدفوع</Label>
+                        <Input
+                          type="number"
+                          placeholder="0.00"
+                          value={formData.paidAmount}
+                          onChange={(e) => {
+                            const paid = parseFloat(e.target.value) || 0;
+                            const total = parseFloat(formData.totalPrice) || 0;
+                            const discount = parseFloat(formData.discount) || 0;
+                            const remaining = total - discount - paid;
+                            const installmentAmount = parseFloat(formData.installmentAmount) || 0;
+                            
+                            let newInstallments: number[] = [];
+                            if (installmentAmount > 0 && remaining > 0) {
+                              const numberOfInstallments = Math.ceil(remaining / installmentAmount);
+                              for (let i = 0; i < numberOfInstallments; i++) {
+                                if (i === numberOfInstallments - 1) {
+                                  // Last installment gets the remainder
+                                  newInstallments.push(remaining - (numberOfInstallments - 1) * installmentAmount);
+                                } else {
+                                  newInstallments.push(installmentAmount);
+                                }
+                              }
+                            }
+                            
+                            setFormData({ 
+                              ...formData, 
+                              paidAmount: e.target.value,
+                              paymentInstallments: newInstallments,
+                            });
+                          }}
+                        />
+                        {formData.paidAmount && (
+                          <p className="text-xs text-gray-500 mt-1">
+                            المتبقي: {(
+                              (parseFloat(formData.totalPrice) || 0) - 
+                              (parseFloat(formData.discount) || 0) - 
+                              (parseFloat(formData.paidAmount) || 0)
+                            ).toFixed(2)} د.أ
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <Label>قيمة القسط الواحد</Label>
+                        <Input
+                          type="number"
+                          placeholder="100.00"
+                          value={formData.installmentAmount}
+                          onChange={(e) => {
+                            const installmentAmount = parseFloat(e.target.value) || 0;
+                            const total = parseFloat(formData.totalPrice) || 0;
+                            const discount = parseFloat(formData.discount) || 0;
+                            const paid = parseFloat(formData.paidAmount) || 0;
+                            const remaining = total - discount - paid;
+                            
+                            let newInstallments: number[] = [];
+                            if (installmentAmount > 0 && remaining > 0) {
+                              const numberOfInstallments = Math.ceil(remaining / installmentAmount);
+                              for (let i = 0; i < numberOfInstallments; i++) {
+                                if (i === numberOfInstallments - 1) {
+                                  // Last installment gets the remainder
+                                  newInstallments.push(remaining - (numberOfInstallments - 1) * installmentAmount);
+                                } else {
+                                  newInstallments.push(installmentAmount);
+                                }
+                              }
+                            }
+                            
+                            setFormData({ 
+                              ...formData, 
+                              installmentAmount: e.target.value,
+                              paymentInstallments: newInstallments,
+                            });
+                          }}
+                        />
+                      </div>
+                    </div>
+                    {formData.paymentInstallments.length > 0 && (
+                      <div>
+                        <Label>الأقساط المولدة تلقائياً</Label>
+                        <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-md border">
+                          <div className="flex flex-wrap gap-2 mb-2">
+                            {formData.paymentInstallments.map((amount, index) => (
+                              <span
+                                key={index}
+                                className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm font-medium"
+                              >
+                                قسط {index + 1}: {amount.toFixed(2)} د.أ
+                              </span>
+                            ))}
+                          </div>
+                          <p className="text-xs text-gray-600 dark:text-gray-400">
+                            عدد الأقساط: {formData.paymentInstallments.length} | 
+                            المجموع: {formData.paymentInstallments.reduce((a, b) => a + b, 0).toFixed(2)} د.أ
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    <div>
+                      <Label>الأقساط (يدوي - مثال: 500, 100, 400)</Label>
+                      <Input
+                        placeholder="500, 100, 400"
+                        value={formData.paymentInstallments.join(", ")}
+                        onChange={(e) => {
+                          const values = e.target.value
+                            .split(",")
+                            .map((v) => parseFloat(v.trim()))
+                            .filter((v) => !isNaN(v));
+                          setFormData({ ...formData, paymentInstallments: values });
+                        }}
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        المجموع: {formData.paymentInstallments.reduce((a, b) => a + b, 0).toFixed(2)} د.أ
+                      </p>
+                    </div>
+                  </>
                 )}
                 <div>
                   <Label>أولوية الطلب</Label>
@@ -634,20 +739,125 @@ export function OrderForm({
                   </Select>
                 </div>
                 {formData.paymentType === "installments" && (
-                  <div>
-                    <Label>الأقساط (مثال: 500, 100, 400)</Label>
-                    <Input
-                      placeholder="500, 100, 400"
-                      value={formData.paymentInstallments.join(", ")}
-                      onChange={(e) => {
-                        const values = e.target.value
-                          .split(",")
-                          .map((v) => parseFloat(v.trim()))
-                          .filter((v) => !isNaN(v));
-                        setFormData({ ...formData, paymentInstallments: values });
-                      }}
-                    />
-                  </div>
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label>المبلغ المدفوع</Label>
+                        <Input
+                          type="number"
+                          placeholder="0.00"
+                          value={formData.paidAmount}
+                          onChange={(e) => {
+                            const paid = parseFloat(e.target.value) || 0;
+                            const total = parseFloat(formData.totalPrice) || 0;
+                            const discount = parseFloat(formData.discount) || 0;
+                            const remaining = total - discount - paid;
+                            const installmentAmount = parseFloat(formData.installmentAmount) || 0;
+                            
+                            let newInstallments: number[] = [];
+                            if (installmentAmount > 0 && remaining > 0) {
+                              const numberOfInstallments = Math.ceil(remaining / installmentAmount);
+                              for (let i = 0; i < numberOfInstallments; i++) {
+                                if (i === numberOfInstallments - 1) {
+                                  // Last installment gets the remainder
+                                  newInstallments.push(remaining - (numberOfInstallments - 1) * installmentAmount);
+                                } else {
+                                  newInstallments.push(installmentAmount);
+                                }
+                              }
+                            }
+                            
+                            setFormData({ 
+                              ...formData, 
+                              paidAmount: e.target.value,
+                              paymentInstallments: newInstallments,
+                            });
+                          }}
+                        />
+                        {formData.paidAmount && (
+                          <p className="text-xs text-gray-500 mt-1">
+                            المتبقي: {(
+                              (parseFloat(formData.totalPrice) || 0) - 
+                              (parseFloat(formData.discount) || 0) - 
+                              (parseFloat(formData.paidAmount) || 0)
+                            ).toFixed(2)} د.أ
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <Label>قيمة القسط الواحد</Label>
+                        <Input
+                          type="number"
+                          placeholder="100.00"
+                          value={formData.installmentAmount}
+                          onChange={(e) => {
+                            const installmentAmount = parseFloat(e.target.value) || 0;
+                            const total = parseFloat(formData.totalPrice) || 0;
+                            const discount = parseFloat(formData.discount) || 0;
+                            const paid = parseFloat(formData.paidAmount) || 0;
+                            const remaining = total - discount - paid;
+                            
+                            let newInstallments: number[] = [];
+                            if (installmentAmount > 0 && remaining > 0) {
+                              const numberOfInstallments = Math.ceil(remaining / installmentAmount);
+                              for (let i = 0; i < numberOfInstallments; i++) {
+                                if (i === numberOfInstallments - 1) {
+                                  // Last installment gets the remainder
+                                  newInstallments.push(remaining - (numberOfInstallments - 1) * installmentAmount);
+                                } else {
+                                  newInstallments.push(installmentAmount);
+                                }
+                              }
+                            }
+                            
+                            setFormData({ 
+                              ...formData, 
+                              installmentAmount: e.target.value,
+                              paymentInstallments: newInstallments,
+                            });
+                          }}
+                        />
+                      </div>
+                    </div>
+                    {formData.paymentInstallments.length > 0 && (
+                      <div>
+                        <Label>الأقساط المولدة تلقائياً</Label>
+                        <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-md border">
+                          <div className="flex flex-wrap gap-2 mb-2">
+                            {formData.paymentInstallments.map((amount, index) => (
+                              <span
+                                key={index}
+                                className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm font-medium"
+                              >
+                                قسط {index + 1}: {amount.toFixed(2)} د.أ
+                              </span>
+                            ))}
+                          </div>
+                          <p className="text-xs text-gray-600 dark:text-gray-400">
+                            عدد الأقساط: {formData.paymentInstallments.length} | 
+                            المجموع: {formData.paymentInstallments.reduce((a, b) => a + b, 0).toFixed(2)} د.أ
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    <div>
+                      <Label>الأقساط (يدوي - مثال: 500, 100, 400)</Label>
+                      <Input
+                        placeholder="500, 100, 400"
+                        value={formData.paymentInstallments.join(", ")}
+                        onChange={(e) => {
+                          const values = e.target.value
+                            .split(",")
+                            .map((v) => parseFloat(v.trim()))
+                            .filter((v) => !isNaN(v));
+                          setFormData({ ...formData, paymentInstallments: values });
+                        }}
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        المجموع: {formData.paymentInstallments.reduce((a, b) => a + b, 0).toFixed(2)} د.أ
+                      </p>
+                    </div>
+                  </>
                 )}
                 <div>
                   <Label>الخصم</Label>

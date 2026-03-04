@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { Role } from "@prisma/client";
+import { ADMIN_PAGES } from "@/lib/rbac/permissions";
 
 import {
   LayoutDashboard,
@@ -35,25 +37,65 @@ type NavItem = {
   exact?: boolean;
 };
 
-const adminNavItems: NavItem[] = [
-  { href: "/admin", label: "لوحة التحكم", icon: LayoutDashboard, exact: true },
-  { href: "/admin/orders", label: "إدارة الطلبات", icon: ShoppingCart },
-  { href: "/admin/employees", label: "الموظفين", icon: UserCheck },
-  { href: "/admin/students", label: "الطلاب", icon: Users },
-  { href: "/admin/content/categories", label: "الفئات", icon: Tag },
-  { href: "/admin/content/services", label: "الخدمات", icon: Package },
-  { href: "/admin/content/testimonials", label: "آراء العملاء", icon: Star },
-  { href: "/admin/content/portfolio", label: "النماذج", icon: FileText },
-  { href: "/admin/content/faqs", label: "الأسئلة الشائعة", icon: MessageSquare },
-  { href: "/admin/finance", label: "النظام المالي", icon: DollarSign },
-  { href: "/admin/content/blog", label: "المقالات", icon: Book },
-  { href: "/admin/notifications", label: "الإشعارات", icon: Ticket },
-  { href: "/admin/settings", label: "الإعدادات", icon: Settings },
-];
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  "/admin": LayoutDashboard,
+  "/admin/orders": ShoppingCart,
+  "/admin/employees": UserCheck,
+  "/admin/students": Users,
+  "/admin/content/categories": Tag,
+  "/admin/content/services": Package,
+  "/admin/content/testimonials": Star,
+  "/admin/content/portfolio": FileText,
+  "/admin/content/faqs": MessageSquare,
+  "/admin/finance": DollarSign,
+  "/admin/content/blog": Book,
+  "/admin/notifications": Ticket,
+  "/admin/settings": Settings,
+};
 
-export function AdminSidebar() {
+interface AdminSidebarProps {
+  userPermissions?: string[] | null;
+  userRole: Role;
+}
+
+export function AdminSidebar({ userPermissions, userRole }: AdminSidebarProps) {
   const pathname = usePathname();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+  // Filter nav items based on permissions
+  const getVisibleNavItems = (): NavItem[] => {
+    if (userRole === "ADMIN") {
+      // ADMIN sees all pages
+      return ADMIN_PAGES.map((page) => ({
+        href: page.path,
+        label: page.label,
+        icon: iconMap[page.path] || LayoutDashboard,
+        exact: page.path === "/admin",
+      }));
+    }
+
+    // EMPLOYEE sees only pages they have permissions for
+    if (userRole === "EMPLOYEE" && userPermissions && userPermissions.length > 0) {
+      return ADMIN_PAGES.filter((page) => {
+        return userPermissions.some((perm) => {
+          // Exact match
+          if (perm === page.path) return true;
+          // Path starts with permission (for nested routes)
+          if (page.path.startsWith(perm + "/")) return true;
+          return false;
+        });
+      }).map((page) => ({
+        href: page.path,
+        label: page.label,
+        icon: iconMap[page.path] || LayoutDashboard,
+        exact: page.path === "/admin",
+      }));
+    }
+
+    return [];
+  };
+
+  const visibleNavItems = getVisibleNavItems();
 
   return (
     <> 
@@ -80,29 +122,35 @@ export function AdminSidebar() {
             </h2>
           </div>
           <nav className="flex-1 space-y-1 p-4">
-            {adminNavItems.map((item) => {
-              const Icon = item.icon;
-              // Fix active state: exact match for admin home, or starts with for others
-              const isActive = item.exact
-                ? pathname === item.href
-                : pathname === item.href || pathname.startsWith(item.href + "/");
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setIsMobileOpen(false)}
-                  className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 text-md font-medium transition-colors",
-                    isActive
-                      ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  )}
-                >
-                  <Icon className="h-5 w-5" />
-                  {item.label}
-                </Link>
-              );
-            })}
+            {visibleNavItems.length > 0 ? (
+              visibleNavItems.map((item) => {
+                const Icon = item.icon;
+                // Fix active state: exact match for admin home, or starts with for others
+                const isActive = item.exact
+                  ? pathname === item.href
+                  : pathname === item.href || pathname.startsWith(item.href + "/");
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setIsMobileOpen(false)}
+                    className={cn(
+                      "flex items-center gap-3 rounded-lg px-3 py-2 text-md font-medium transition-colors",
+                      isActive
+                        ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
+                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    )}
+                  >
+                    <Icon className="h-5 w-5" />
+                    {item.label}
+                  </Link>
+                );
+              })
+            ) : (
+              <div className="text-sm text-gray-500 dark:text-gray-400 p-4 text-center">
+                لا توجد صفحات متاحة
+              </div>
+            )}
             <div className="pt-4 border-t border-gray-200 dark:border-gray-700 mt-4">
               <Link
                 href="/"

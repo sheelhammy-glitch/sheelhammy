@@ -32,6 +32,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const prisma = await getPrisma();
         const user = await prisma.user.findUnique({
           where: { email: credentials.email as string },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            role: true,
+            avatar: true,
+            password: true,
+            permissions: true,
+          },
         });
 
         if (!user) {
@@ -47,12 +56,29 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null;
         }
 
+        // Parse permissions if it's a JSON string
+        let permissions: string[] | null = null;
+        if (user.permissions) {
+          if (Array.isArray(user.permissions)) {
+            // Ensure all items are strings
+            permissions = user.permissions.filter((p): p is string => typeof p === 'string');
+          } else if (typeof user.permissions === 'string') {
+            try {
+              const parsed = JSON.parse(user.permissions);
+              permissions = Array.isArray(parsed) ? parsed.filter((p): p is string => typeof p === 'string') : null;
+            } catch {
+              permissions = null;
+            }
+          }
+        }
+
         return {
           id: user.id,
           email: user.email,
           name: user.name,
           role: user.role,
           avatar: user.avatar,
+          permissions,
         };
       },
     }),
@@ -62,6 +88,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         token.id = user.id;
         token.role = user.role;
+        // Type assertion needed because permissions is added dynamically
+        const userWithPermissions = user as typeof user & { permissions?: string[] | null };
+        token.permissions = userWithPermissions.permissions || null;
       }
       return token;
     },
@@ -69,6 +98,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as Role;
+        session.user.permissions = token.permissions || null;
       }
       return session;
     },
