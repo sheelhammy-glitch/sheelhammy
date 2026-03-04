@@ -40,38 +40,24 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/api/referrer") ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/favicon")
-
   ) {
     return NextResponse.next();
   }
- 
-  if (!token) {
-    const loginUrl = new URL("/login", request.url);
+
+  // Only redirect authenticated users (admin or employee) based on their role
+  // Non-authenticated users can access all routes without redirect
+  if (token) {
+    const role = token.role as Role;
+    const permissions = (token.permissions as string[] | null | undefined) || null;
     
-    // Validate callbackUrl - only allow internal paths
-    // Prevent external URLs, encoded paths like %2F%24, or invalid paths
-    const isValidPath = pathname && 
-      pathname.startsWith("/") && 
-      !pathname.startsWith("//") &&
-      !pathname.includes("http") &&
-      !pathname.includes("%2F%24") &&
-      pathname.length < 200; // reasonable path length limit
-    
-    if (isValidPath) {
-      loginUrl.searchParams.set("callbackUrl", pathname);
+    // Check if user can access this route
+    if (!canAccessRoute(role, pathname, permissions)) {
+      const redirectPath = getRedirectPath(role);
+      return NextResponse.redirect(new URL(redirectPath, request.url));
     }
-    // If path is invalid, don't set callbackUrl (user will be redirected to dashboard after login)
-    
-    return NextResponse.redirect(loginUrl);
-  }
- 
-  const role = token.role as Role;
-  const permissions = (token.permissions as string[] | null | undefined) || null;
-  if (!canAccessRoute(role, pathname, permissions)) {
-    const redirectPath = getRedirectPath(role);
-    return NextResponse.redirect(new URL(redirectPath, request.url));
   }
 
+  // Allow access to all routes - no redirect to login for non-authenticated users
   return NextResponse.next();
 }
 
