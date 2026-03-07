@@ -317,13 +317,20 @@ function ContactFormContent() {
   );
 
   const FieldLabel = ({ children }: { children: React.ReactNode }) => (
-    <label className="block text-sm font-extrabold text-black dark:text-white mb-2">{children}</label>
+    <label className="block text-sm font-extrabold text-black dark:text-white mb-2.5">{children}</label>
   );
 
   const inputBase =
-    "w-full pr-12 pl-4 py-3.5 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 " +
-    "focus:border-[#0056D2] dark:focus:border-blue-500 focus:ring-2 focus:ring-[#0056D2]/20 dark:focus:ring-blue-500/20 focus:outline-none transition-all duration-200 " +
-    "hover:border-gray-300 dark:hover:border-gray-600";
+    "w-full pr-12 pl-4 py-4 rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 text-base " +
+    "focus:border-[#0056D2] dark:focus:border-blue-500 focus:ring-4 focus:ring-[#0056D2]/10 dark:focus:ring-blue-500/20 focus:outline-none transition-all duration-300 " +
+    "hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm " +
+    "disabled:opacity-50 disabled:cursor-not-allowed";
+
+  const selectBase =
+    "w-full pr-12 pl-4 py-4 rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-base appearance-none cursor-pointer " +
+    "focus:border-[#0056D2] dark:focus:border-blue-500 focus:ring-4 focus:ring-[#0056D2]/10 dark:focus:ring-blue-500/20 focus:outline-none transition-all duration-300 " +
+    "hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm " +
+    "disabled:opacity-50 disabled:cursor-not-allowed";
 
   const container = {
     hidden: { opacity: 0, y: 14 },
@@ -338,16 +345,13 @@ function ContactFormContent() {
   return (
     <section
       dir="rtl"
-      className="py-20 relative overflow-hidden bg-white dark:bg-gray-900"
-    >
-      {/* subtle background accents */}
+      className="py-12 sm:py-16 lg:py-20 relative overflow-hidden bg-white dark:bg-gray-900"
+    > 
       <div className="pointer-events-none absolute inset-0">
-
-        {/* very light blue gradient wash */}
+ 
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,#E1EFFF40,transparent_55%)] dark:bg-[radial-gradient(circle_at_20%_20%,rgba(30,58,138,0.15),transparent_55%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_60%,#E1EFFF30,transparent_55%)] dark:bg-[radial-gradient(circle_at_80%_60%,rgba(30,64,175,0.1),transparent_55%)]" />
-
-        {/* ultra soft blobs */}
+ 
         <div className="absolute -top-32 -left-32 w-[520px] h-[520px] bg-[#E1EFFF]/5 dark:bg-blue-900/10 rounded-full blur-1xl" />
         <div className="absolute -bottom-32 -right-32 w-[520px] h-[520px] bg-[#E1EFFF]/30 dark:bg-blue-800/20 rounded-full blur-3xl" />
       </div>
@@ -358,11 +362,11 @@ function ContactFormContent() {
         initial="hidden"
         whileInView="show"
         viewport={{ once: true, amount: 0.2 }}
-        className="relative container mx-auto px-4 sm:px-6 lg:px-8 lg:w-7xl w-full"
+        className="relative container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 max-w-7xl w-full"
       > 
-        <motion.div variants={item} className="mb-6">
-          <div className="grid md:grid-cols-3 gap-3">
-            {/* WhatsApp Card */}
+        <motion.div variants={item} className="mb-6 sm:mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+         
             <a
               href={WHATSAPP_LINK}
               target="_blank"
@@ -413,7 +417,7 @@ function ContactFormContent() {
           </div>
 
           {/* Working Hours & Info - Compact Row */}
-          <div className="mt-3 grid md:grid-cols-2 gap-3">
+          <div className="mt-3 sm:mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {/* Working Hours */}
             <div className="flex items-center gap-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3">
               <div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
@@ -454,35 +458,35 @@ function ContactFormContent() {
         </motion.div>
 
         {/* Form Section */}
-        <motion.div variants={item} className="w-full max-w-6xl mx-auto">
+        <motion.div variants={item} className="w-full md:w-6xl mx-auto">
           <form
             onSubmit={handleSubmit}
-            className="relative bg-white dark:bg-gray-800 rounded-3xl p-8 md:p-10 lg:p-12 border border-gray-200 dark:border-gray-700
+            className="relative bg-white dark:bg-gray-800 rounded-3xl p-3 sm:p-6 md:p-10 lg:p-12 border border-gray-200 dark:border-gray-700
              shadow-xl dark:shadow-gray-900/50"
           >
             {/* Card Title */}
-            <div className="mb-8 text-center">
+            <div className="mb-6 sm:mb-8 text-center">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-xs font-bold mb-4">
                 <Icon icon="solar:check-circle-bold" className="w-4 h-4" />
                 <span>إرسال سريع وآمن</span>
               </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">
                 نموذج الطلب
               </h3>
-              <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 px-2">
                 املأ المعلومات أدناه — وسيفتح واتساب برسالة جاهزة ومنظمة بكل التفاصيل
               </p>
              
             </div>
 
             {/* name/email */}
-            <div className="grid md:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
                 <div>
                   <FieldLabel>الاسم الكامل</FieldLabel>
-                  <div className="relative">
+                  <div className="relative group">
                     <Icon
                       icon="solar:user-bold"
-                      className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0056D2]"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0056D2] dark:text-blue-400 z-10 pointer-events-none transition-colors"
                     />
                     <input
                       type="text"
@@ -501,17 +505,16 @@ function ContactFormContent() {
                   <FieldLabel>
                     البريد الإلكتروني <span className="text-xs font-bold text-black/40 dark:text-gray-500">(اختياري)</span>
                   </FieldLabel>
-                  <div className="relative">
+                  <div className="relative group">
                     <Icon
                       icon="solar:letter-bold"
-                      className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0056D2]"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0056D2] dark:text-blue-400 z-10 pointer-events-none transition-colors"
                     />
                     <input
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      // ✅ غير إجباري
                       className={inputBase}
                       placeholder="example@email.com"
                       autoComplete="email"
@@ -522,21 +525,21 @@ function ContactFormContent() {
               </div>
 
             {/* phone/service */}
-            <div className="grid md:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
                 <div>
                   <FieldLabel>رقم الهاتف (إجباري)</FieldLabel>
 
-                  <div className="grid grid-cols-[150px_1fr] gap-3">
-                    <div className="relative">
+                  <div className="grid grid-cols-1 sm:grid-cols-[150px_1fr] gap-3 sm:gap-3">
+                    <div className="relative group">
                       <Icon
                         icon="solar:flag-bold"
-                        className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0056D2]"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0056D2] dark:text-blue-400 z-10 pointer-events-none"
                       />
                       <select
                         name="phoneCountryDial"
                         value={formData.phoneCountryDial}
                         onChange={handleChange}
-                        className={inputBase}
+                        className={selectBase}
                         required
                       >
                         {ARAB_COUNTRIES.map((c) => (
@@ -545,12 +548,16 @@ function ContactFormContent() {
                           </option>
                         ))}
                       </select>
+                      <Icon
+                        icon="solar:alt-arrow-down-bold"
+                        className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+                      />
                     </div>
 
-                    <div className="relative">
+                    <div className="relative group">
                       <Icon
                         icon="solar:phone-bold"
-                        className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0056D2]"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0056D2] dark:text-blue-400 z-10 pointer-events-none"
                       />
                       <input
                         type="tel"
@@ -566,25 +573,25 @@ function ContactFormContent() {
                     </div>
                   </div>
 
-                  <p className="mt-2 text-xs text-black/60">
+                  <p className="mt-2 text-xs text-black/60 dark:text-gray-400">
                     سيتم إرسال الرقم بصيغة:{" "}
-                    <span className="font-extrabold text-black">{fullPhone || "+962 ..."}</span>
+                    <span className="font-extrabold text-black dark:text-white">{fullPhone || "+962 ..."}</span>
                   </p>
                 </div>
 
                 <div>
                   <FieldLabel>نوع الخدمة</FieldLabel>
-                  <div className="relative">
+                  <div className="relative group">
                     <Icon
                       icon="solar:book-2-bold"
-                      className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0056D2]"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0056D2] dark:text-blue-400 z-10 pointer-events-none"
                     />
                     <select
                       name="service"
                       value={formData.service}
                       onChange={handleChange}
                       required
-                      className={inputBase}
+                      className={selectBase}
                     >
                       <option value="">اختر الخدمة</option>
                       <option value="assignment">إعداد الأسايمنت</option>
@@ -596,25 +603,29 @@ function ContactFormContent() {
                       <option value="presentation">عروض تقديمية (PPT)</option>
                       <option value="other">أخرى</option>
                     </select>
+                    <Icon
+                      icon="solar:alt-arrow-down-bold"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+                    />
                   </div>
                 </div>
               </div>
 
             {/* Student fields */}
-            <div className="grid md:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
                 <div>
                   <FieldLabel>المرحلة الدراسية</FieldLabel>
-                  <div className="relative">
+                  <div className="relative group">
                     <Icon
                       icon="solar:graduation-cap-bold"
-                      className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0056D2]"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0056D2] dark:text-blue-400 z-10 pointer-events-none"
                     />
                     <select
                       name="academicLevel"
                       value={formData.academicLevel}
                       onChange={handleChange}
                       required
-                      className={inputBase}
+                      className={selectBase}
                     >
                       <option value="">اختر المرحلة</option>
                       <option value="school">مدرسة</option>
@@ -624,15 +635,19 @@ function ContactFormContent() {
                       <option value="phd">دكتوراه</option>
                       <option value="other">أخرى</option>
                     </select>
+                    <Icon
+                      icon="solar:alt-arrow-down-bold"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+                    />
                   </div>
                 </div>
 
                 <div>
                   <FieldLabel>المادة / التخصص</FieldLabel>
-                  <div className="relative">
+                  <div className="relative group">
                     <Icon
                       icon="solar:book-bold"
-                      className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0056D2]"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0056D2] dark:text-blue-400 z-10 pointer-events-none"
                     />
                     <input
                       type="text"
@@ -646,13 +661,13 @@ function ContactFormContent() {
                 </div>
               </div>
 
-            <div className="grid md:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
               <div>
                 <FieldLabel>الجامعة / المدرسة</FieldLabel>
-                  <div className="relative">
+                  <div className="relative group">
                     <Icon
                       icon="solar:buildings-2-bold"
-                      className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0056D2]"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0056D2] dark:text-blue-400 z-10 pointer-events-none"
                     />
                     <input
                       type="text"
@@ -667,36 +682,36 @@ function ContactFormContent() {
 
                 <div>
                   <FieldLabel>موعد التسليم (تاريخ فقط)</FieldLabel>
-                  <div className="relative">
+                  <div className="relative group">
                     <Icon
                       icon="solar:calendar-date-bold"
-                      className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0056D2]"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0056D2] dark:text-blue-400 z-10 pointer-events-none"
                     />
                     <input
-                      type="date" // ✅ تاريخ فقط
+                      type="date"
                       name="deadline"
                       value={formData.deadline}
                       onChange={handleChange}
-                      className={inputBase}
+                      className={inputBase + " [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:left-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full"}
                     />
                   </div>
                 </div>
               </div>
 
             {/* Replace pagesOrWords */}
-            <div className="grid md:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
                 <div>
                   <FieldLabel>نوع المخرجات المطلوبة</FieldLabel>
-                  <div className="relative">
+                  <div className="relative group">
                     <Icon
                       icon="solar:document-text-bold"
-                      className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0056D2]"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0056D2] dark:text-blue-400 z-10 pointer-events-none"
                     />
                     <select
                       name="pagesOrWords"
                       value={formData.pagesOrWords}
                       onChange={handleChange}
-                      className={inputBase}
+                      className={selectBase}
                     >
                       <option value="">اختر</option>
                       <option value="word">ملف Word</option>
@@ -705,59 +720,71 @@ function ContactFormContent() {
                       <option value="both_word_pdf">Word + PDF</option>
                       <option value="other">أخرى</option>
                     </select>
+                    <Icon
+                      icon="solar:alt-arrow-down-bold"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+                    />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <FieldLabel>اللغة</FieldLabel>
-                    <div className="relative">
+                    <div className="relative group">
                       <Icon
                         icon="solar:translation-bold"
-                        className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0056D2]"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0056D2] dark:text-blue-400 z-10 pointer-events-none"
                       />
                       <select
                         name="language"
                         value={formData.language}
                         onChange={handleChange}
-                        className={inputBase}
+                        className={selectBase}
                       >
                         <option value="ar">العربية</option>
                         <option value="en">الإنجليزية</option>
                         <option value="both">عربي + إنجليزي</option>
                       </select>
+                      <Icon
+                        icon="solar:alt-arrow-down-bold"
+                        className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+                      />
                     </div>
                   </div>
 
                   <div>
                     <FieldLabel>الاستعجال</FieldLabel>
-                    <div className="relative">
+                    <div className="relative group">
                       <Icon
                         icon="solar:bolt-bold"
-                        className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0056D2]"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#0056D2] dark:text-blue-400 z-10 pointer-events-none"
                       />
                       <select
                         name="urgency"
                         value={formData.urgency}
                         onChange={handleChange}
-                        className={inputBase}
+                        className={selectBase}
                       >
                         <option value="normal">عادي</option>
                         <option value="urgent">مستعجل</option>
                         <option value="very_urgent">مستعجل جداً</option>
                       </select>
+                      <Icon
+                        icon="solar:alt-arrow-down-bold"
+                        className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+                      />
                     </div>
                   </div>
                 </div>
               </div>
 
             {/* Details */}
-            <div className="mb-8">
+            <div className="mb-6 sm:mb-8">
               <FieldLabel>تفاصيل الطلب</FieldLabel>
-              <div className="relative">
+              <div className="relative group">
                 <Icon
                   icon="solar:chat-round-dots-bold"
-                  className="absolute right-4 top-4 w-5 h-5 text-[#0056D2] dark:text-blue-400"
+                  className="absolute right-4 top-4 w-5 h-5 text-[#0056D2] dark:text-blue-400 z-10 pointer-events-none"
                 />
                 <textarea
                   name="message"
@@ -766,9 +793,9 @@ function ContactFormContent() {
                   required
                   rows={5}
                   className={
-                    "w-full pr-12 pl-4 py-3.5 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 " +
-                    "focus:border-[#0056D2] dark:focus:border-blue-500 focus:ring-2 focus:ring-[#0056D2]/20 dark:focus:ring-blue-500/20 focus:outline-none transition-all duration-200 resize-none " +
-                    "hover:border-gray-300 dark:hover:border-gray-600"
+                    "w-full pr-12 pl-4 py-4 rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 text-base " +
+                    "focus:border-[#0056D2] dark:focus:border-blue-500 focus:ring-4 focus:ring-[#0056D2]/10 dark:focus:ring-blue-500/20 focus:outline-none transition-all duration-300 resize-none " +
+                    "hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm"
                   }
                   placeholder="اكتب المطلوب بالتفصيل + تعليمات الدكتور + تنسيق APA/MLA..."
                 />
@@ -778,14 +805,15 @@ function ContactFormContent() {
             <Button
               type="submit"
               size="xl"
-              className="group relative w-full overflow-hidden rounded-xl
+              className="group relative w-full overflow-hidden rounded-2xl
            bg-gradient-to-r from-green-500 to-green-600
-           text-white font-bold text-base
+           text-white font-bold text-base sm:text-lg
            flex items-center justify-center gap-3
-           px-8 py-4
+           px-6 sm:px-8 py-4 sm:py-5
            transition-all duration-300
            shadow-lg shadow-green-500/30
-           hover:shadow-md hover:shadow-green-500/40"
+           hover:shadow-xl hover:shadow-green-500/40 hover:scale-[1.02]
+           active:scale-[0.98]"
             >
               <Icon icon="logos:whatsapp-icon" className="w-6 h-6 relative z-10" />
               <span className="relative z-10">
@@ -797,10 +825,10 @@ function ContactFormContent() {
               />
             </Button>
 
-            <div className="mt-6 text-center">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
-                <Icon icon="solar:shield-check-bold" className="w-4 h-4 text-green-500" />
-                <p className="text-xs text-gray-600 dark:text-gray-400">
+            <div className="mt-4 sm:mt-6 text-center">
+              <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+                <Icon icon="solar:shield-check-bold" className="w-4 h-4 text-green-500 shrink-0" />
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                   بالضغط على إرسال، سيتم فتح واتساب مع رسالة منظمة بكل المعلومات
                 </p>
               </div>
