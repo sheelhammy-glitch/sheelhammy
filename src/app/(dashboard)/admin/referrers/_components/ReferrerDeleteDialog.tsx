@@ -18,6 +18,10 @@ export function ReferrerDeleteDialog({
   onConfirm,
 }: ReferrerDeleteDialogProps) {
   if (!referrer) return null;
+ 
+  const hasOrders = referrer.stats.totalOrders > 0;
+  const hasReferrals = referrer.stats.pendingReferrals > 0;
+  const cannotDelete = hasOrders || hasReferrals;
 
   return (
     <ConfirmDialog
@@ -27,10 +31,23 @@ export function ReferrerDeleteDialog({
       description={
         <>
           <span className="block mb-2">هل أنت متأكد من حذف المندوب {referrer.name}؟</span>
-          {referrer.stats.totalOrders > 0 && (
-            <span className="block text-sm text-red-600">
-              تحذير: هذا المندوب لديه {referrer.stats.totalOrders} طلب. لا يمكن حذفه.
-            </span>
+          {cannotDelete && (
+            <div className="mt-3 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+              <p className="text-sm font-semibold text-red-700 dark:text-red-400 mb-2">
+                لا يمكن حذف هذا المندوب لأنه يحتوي على:
+              </p>
+              <ul className="list-disc list-inside text-sm text-red-600 dark:text-red-300 space-y-1">
+                {hasOrders && (
+                  <li>{referrer.stats.totalOrders} طلب مرتبط</li>
+                )}
+                {hasReferrals && (
+                  <li>{referrer.stats.pendingReferrals} إحالة معلقة</li>
+                )}
+              </ul>
+              <p className="text-xs text-red-600 dark:text-red-400 mt-2">
+                يجب حذف أو نقل جميع السجلات المرتبطة أولاً
+              </p>
+            </div>
           )}
         </>
       }
@@ -38,7 +55,7 @@ export function ReferrerDeleteDialog({
       cancelLabel="إلغاء"
       onConfirm={onConfirm}
       variant="destructive"
-      disabled={referrer.stats.totalOrders > 0}
+      disabled={cannotDelete}
     />
   );
 }

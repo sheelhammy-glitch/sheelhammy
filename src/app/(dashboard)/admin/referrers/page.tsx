@@ -82,8 +82,9 @@ export default function ReferrersPage() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "حدث خطأ");
+        const errorData = await response.json();
+        const errorMessage = errorData.details || errorData.error || "حدث خطأ";
+        throw new Error(errorMessage);
       }
 
       toast.success("تم حذف المندوب بنجاح");

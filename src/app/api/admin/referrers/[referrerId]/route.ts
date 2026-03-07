@@ -188,12 +188,16 @@ export async function DELETE(
 
     const { referrerId } = await params;
 
-    // Check if referrer has orders
+    // Check if referrer exists and has related records
     const referrer = await prisma.referrer.findUnique({
       where: { id: referrerId },
       include: {
-        orders: {
-          select: { id: true },
+        _count: {
+          select: {
+            orders: true,
+            payments: true,
+            referrals: true,
+          },
         },
       },
     });
@@ -205,9 +209,22 @@ export async function DELETE(
       );
     }
 
-    if (referrer.orders.length > 0) {
+    // Check for related records
+    const hasOrders = referrer._count.orders > 0;
+    const hasPayments = referrer._count.payments > 0;
+    const hasReferrals = referrer._count.referrals > 0;
+
+    if (hasOrders || hasPayments || hasReferrals) {
+      const reasons = [];
+      if (hasOrders) reasons.push(`${referrer._count.orders} طلب`);
+      if (hasPayments) reasons.push(`${referrer._count.payments} دفعة`);
+      if (hasReferrals) reasons.push(`${referrer._count.referrals} إحالة`);
+
       return NextResponse.json(
-        { error: "Cannot delete referrer with existing orders" },
+        {
+          error: "Cannot delete referrer with existing related records",
+          details: `يحتوي على: ${reasons.join("، ")}`,
+        },
         { status: 400 }
       );
     }

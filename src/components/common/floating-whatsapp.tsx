@@ -1,18 +1,54 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo, Suspense } from "react";
 import { Icon } from "@iconify/react";
-import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 const WHATSAPP_NUMBER = "962781858647";
-const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}`;
 
-export function FloatingWhatsApp() {
+function FloatingWhatsAppContent() {
   const [isHovered, setIsHovered] = useState(false);
+  const [referrerCode, setReferrerCode] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    // Check URL params first
+    const ref = searchParams?.get("ref");
+    if (ref) {
+      if (typeof window !== "undefined") {
+        localStorage.setItem("referrerCode", ref);
+      }
+      setReferrerCode(ref);
+    } else {
+      // Check localStorage
+      if (typeof window !== "undefined") {
+        const savedRef = localStorage.getItem("referrerCode");
+        if (savedRef) {
+          setReferrerCode(savedRef);
+        }
+      }
+    }
+  }, [searchParams]);
+
+  const whatsappLink = useMemo(() => {
+    let message = "مرحبا، أريد خدمة أكاديمية";
+    
+    if (referrerCode) {
+      message += `\nكود المندوب: ${referrerCode}`;
+    }
+    
+    return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+  }, [referrerCode]);
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    window.open(whatsappLink, "_blank");
+  };
 
   return (
-    <Link
-      href={WHATSAPP_LINK}
+    <a
+      href={whatsappLink}
+      onClick={handleClick}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="تواصل معنا على WhatsApp"
@@ -78,6 +114,14 @@ export function FloatingWhatsApp() {
           <Icon icon="solar:arrow-right-bold" className="w-4 h-4 text-neutral-500" />
         </div>
       </div>
-    </Link>
+    </a>
+  );
+}
+
+export function FloatingWhatsApp() {
+  return (
+    <Suspense fallback={null}>
+      <FloatingWhatsAppContent />
+    </Suspense>
   );
 }
