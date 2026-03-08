@@ -19,11 +19,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Combobox } from "@/components/ui/combobox";
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxValue,
+} from "@/components/ui/combobox";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
 import { PAYMENT_TYPES, ORDER_PRIORITIES, GRADE_TYPES, BTEC_GRADES } from "@/lib/countries";
-import { Icon } from "@iconify/react";
+ 
 import { Trash2, Plus } from "lucide-react";
 
 type Student = {
@@ -41,6 +49,12 @@ type Employee = {
   name: string;
   isReferrer?: boolean;
   referrerCode?: string | null;
+};
+
+type Referrer = {
+  id: string;
+  name: string;
+  code: string;
 };
 
 type ServiceItem = {
@@ -69,6 +83,7 @@ interface MultiServiceOrderFormProps {
   students: Student[];
   services: Service[];
   employees: Employee[];
+  referrers?: Referrer[];
   onSuccess: () => void;
 }
 
@@ -78,11 +93,14 @@ export function MultiServiceOrderForm({
   students,
   services,
   employees,
+  referrers = [],
   onSuccess,
 }: MultiServiceOrderFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [studentId, setStudentId] = useState("");
+  const [studentSearch, setStudentSearch] = useState("");
   const [referrerId, setReferrerId] = useState("");
+  const [referrerCommission, setReferrerCommission] = useState("");
   const [deadline, setDeadline] = useState("");
   const [priority, setPriority] = useState("normal");
   const [serviceItems, setServiceItems] = useState<ServiceItem[]>([
@@ -116,7 +134,9 @@ export function MultiServiceOrderForm({
     } else {
       // Reset form when closed
       setStudentId("");
+      setStudentSearch("");
       setReferrerId("");
+      setReferrerCommission("");
       setDeadline("");
       setPriority("normal");
       setServiceItems([
@@ -262,6 +282,7 @@ export function MultiServiceOrderForm({
           customServiceName: item.isCustom ? item.customServiceName : null,
             employeeId: item.employeeId && item.employeeId !== "none" ? item.employeeId : null,
             referrerId: referrerId && referrerId !== "none" ? referrerId : null,
+            referrerCommission: referrerCommission ? parseFloat(referrerCommission) : null,
           totalPrice: parseFloat(item.price),
           employeeProfit: item.employeeProfit ? parseFloat(item.employeeProfit) : 0,
           deadline: deadline || null,
@@ -319,20 +340,49 @@ export function MultiServiceOrderForm({
             <div>
               <Label>الطالب *</Label>
               <Combobox
-                options={students.map((student) => ({
-                  value: student.id,
-                  label: student.name,
-                }))}
+                items={students.map((s) => s.id)}
                 value={studentId}
-                onValueChange={setStudentId}
-                placeholder="اختر الطالب"
-                searchPlaceholder="ابحث عن طالب..."
-                emptyText="لا يوجد طلاب"
-                required
-              />
+                onValueChange={(value) => {
+                  setStudentId(value ?? "");
+                  setStudentSearch("");
+                }}
+              >
+                <ComboboxInput 
+                  placeholder="اختر الطالب"
+                  value={studentId ? (students.find((s) => s.id === studentId)?.name || "") : studentSearch}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    const searchValue = e.target.value;
+                    setStudentSearch(searchValue); 
+                    if (studentId) {
+                      setStudentId("");
+                    }
+                  }}
+                />
+                <ComboboxContent>
+                  <ComboboxList>
+                    {(() => {
+                      const filteredStudents = students.filter((student) => 
+                        !studentSearch || 
+                        student.name.toLowerCase().includes(studentSearch.toLowerCase())
+                      );
+                      return filteredStudents.length === 0 ? (
+                        <div className="py-6 text-center text-sm text-muted-foreground">لا يوجد طلاب</div>
+                      ) : (
+                        filteredStudents.map((student) => (
+                          <ComboboxItem 
+                            key={student.id} 
+                            value={student.id}
+                          >
+                            {student.name}
+                          </ComboboxItem>
+                        ))
+                      );
+                    })()}
+                  </ComboboxList>
+                </ComboboxContent>
+              </Combobox>
             </div>
-
-            {/* Referrer Selection */}
+ 
             <div>
               <Label>المندوب (اختياري)</Label>
               <Select value={referrerId} onValueChange={setReferrerId}>
@@ -341,15 +391,29 @@ export function MultiServiceOrderForm({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">لا يوجد مندوب</SelectItem>
-                  {employees
-                    .filter((emp) => emp.isReferrer)
-                    .map((employee) => (
-                      <SelectItem key={employee.id} value={employee.id}>
-                        {employee.name} {employee.referrerCode && `(${employee.referrerCode})`}
-                      </SelectItem>
-                    ))}
+                  {referrers.map((referrer) => (
+                    <SelectItem key={referrer.id} value={referrer.id}>
+                      {referrer.name} ({referrer.code})
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
+              {referrerId && referrerId !== "none" && (
+                <div className="mt-2">
+                  <Label>ربح المندوب من الطلب</Label>
+                  <Input
+                    type="number"
+                    placeholder="0.00"
+                    value={referrerCommission}
+                    onChange={(e) => setReferrerCommission(e.target.value)}
+                    min={0}
+                    step="0.01"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    سيتم تطبيق هذا المبلغ على جميع الخدمات في هذا الطلب
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Common Fields */}
