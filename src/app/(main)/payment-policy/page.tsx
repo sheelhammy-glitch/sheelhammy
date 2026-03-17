@@ -1,9 +1,11 @@
 import React from "react";
+import type { Metadata } from "next";
 import { PageHero } from "@/components/common/page-hero";
 import { PolicyContent } from "../../../components/common/policy-content";
 import { generateSEOMetadata } from '@/lib/seo/metadata';
+import AnimatedContent from "@/components/animated-content";
 
-export async function generateMetadata() {
+export async function generateMetadata(): Promise<Metadata> {
   return generateSEOMetadata({
     title: "سياسة الدفع - شيل همّي",
     description: "تعرف على سياسات الدفع في شيل همّي وآلية تحويل رسوم الخدمات الأكاديمية، مواعيد السداد، تأكيد العمليات، وضمان الأمان والسرية في جميع المعاملات.",
@@ -107,12 +109,16 @@ const content = {
 export default function PaymentPolicyPage() {
   return (
     <main>
-      <PageHero
-        title={content.title}
-        badge="سياساتنا"
-        badgeIcon="solar:card-bold"
-      />
-      <PolicyContent {...content} />
+      <AnimatedContent distance={22} duration={0.7}>
+        <PageHero
+          title={content.title}
+          badge="سياساتنا"
+          badgeIcon="solar:card-bold"
+        />
+      </AnimatedContent>
+      <AnimatedContent distance={18} duration={0.65} delay={0.06}>
+        <PolicyContent {...content} />
+      </AnimatedContent>
     </main>
   );
 }

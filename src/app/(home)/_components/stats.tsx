@@ -2,6 +2,7 @@
 
 import { Icon } from "@iconify/react";
 import { useEffect, useState, useRef } from "react";
+import AnimatedContent from "@/components/animated-content";
 
 const STATS = [
   { icon: "fluent-emoji-high-contrast:man-teacher", number: 95, label: "خبير متخصص", suffix: "+" },
@@ -47,8 +48,8 @@ function CountUp({
 
     requestAnimationFrame(animate);
   }, [end, duration, start, mounted]);
- 
- 
+
+
   const displayCount = count.toLocaleString('en-US');
 
   return <span suppressHydrationWarning>{displayCount}</span>;
@@ -84,10 +85,17 @@ export function Stats() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 lg:w-7xl w-full">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 lg:gap-7">
           {STATS.map((stat, index) => (
-            <div key={index} className="flex flex-col items-center text-center group cursor-default">
+            <AnimatedContent
+              key={index}
+              distance={14}
+              duration={0.55}
+              delay={index * 0.06}
+              className="h-full"
+            >
+              <div className="flex flex-col items-center text-center group cursor-default">
 
-              <div
-                className="
+                <div
+                  className="
                   relative w-16 h-16 rounded-xl
                   bg-white
                   flex items-center justify-center mb-3
@@ -96,35 +104,36 @@ export function Stats() {
                   transition-all duration-300
                   overflow-hidden
                 "
-              >
-                <span className="absolute inset-0 pointer-events-none">
-                  <span
-                    className="absolute inset-[-2px] rounded-[14px] animate-spin"
-                    style={{
-                      animationDuration: "3s",
-                      background:
-                        "conic-gradient(from 0deg, rgba(0,86,210,0) 0deg, rgba(0,86,210,0.95) 80deg, rgba(0,86,210,0) 160deg, rgba(0,86,210,0) 360deg)",
-                    }}
+                >
+                  <span className="absolute inset-0 pointer-events-none">
+                    <span
+                      className="absolute inset-[-2px] rounded-[14px] animate-spin"
+                      style={{
+                        animationDuration: "3s",
+                        background:
+                          "conic-gradient(from 0deg, rgba(0,86,210,0) 0deg, rgba(0,86,210,0.95) 80deg, rgba(0,86,210,0) 160deg, rgba(0,86,210,0) 360deg)",
+                      }}
+                    />
+                    <span className="absolute inset-[2px] rounded-[12px] bg-white" />
+                  </span>
+
+                  <Icon
+                    icon={stat.icon}
+                    className="relative w-7 h-7 text-[#0056d2]"
                   />
-                  <span className="absolute inset-[2px] rounded-[12px] bg-white" />
-                </span>
+                </div>
 
-                <Icon
-                  icon={stat.icon}
-                  className="relative w-7 h-7 text-[#0056d2]"
-                />
+                <div className="text-2xl md:text-3xl font-bold text-[#0f1114] mb-1 transition-colors duration-300 group-hover:text-[#0056d2]">
+                  {stat.suffix}
+                  <CountUp end={stat.number} start={startCount} />
+                </div>
+
+                <div className="text-sm md:text-base font-bold text-gray-700 transition-colors duration-300 group-hover:text-[#0056d2]">
+                  {stat.label}
+                </div>
+
               </div>
-
-              <div className="text-2xl md:text-3xl font-bold text-[#0f1114] mb-1 transition-colors duration-300 group-hover:text-[#0056d2]">
-                {stat.suffix}
-                <CountUp end={stat.number} start={startCount} />
-              </div>
-
-              <div className="text-sm md:text-base font-bold text-gray-700 transition-colors duration-300 group-hover:text-[#0056d2]">
-                {stat.label}
-              </div>
-
-            </div>
+            </AnimatedContent>
           ))}
         </div>
       </div>

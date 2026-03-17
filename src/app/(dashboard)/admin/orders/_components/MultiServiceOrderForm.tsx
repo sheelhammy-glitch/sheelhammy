@@ -19,20 +19,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Combobox,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-  ComboboxValue,
-} from "@/components/ui/combobox";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PAYMENT_TYPES, ORDER_PRIORITIES, GRADE_TYPES, BTEC_GRADES } from "@/lib/countries";
- 
+
 import { Trash2, Plus } from "lucide-react";
 
 type Student = {
@@ -99,7 +91,6 @@ export function MultiServiceOrderForm({
 }: MultiServiceOrderFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [studentId, setStudentId] = useState("");
-  const [studentSearch, setStudentSearch] = useState("");
   const [referrerId, setReferrerId] = useState("");
   const [referrerCommission, setReferrerCommission] = useState("");
   const [payReferrer, setPayReferrer] = useState(false);
@@ -136,7 +127,6 @@ export function MultiServiceOrderForm({
     } else {
       // Reset form when closed
       setStudentId("");
-      setStudentSearch("");
       setReferrerId("");
       setReferrerCommission("");
       setPayReferrer(false);
@@ -283,10 +273,10 @@ export function MultiServiceOrderForm({
           studentId,
           serviceId,
           customServiceName: item.isCustom ? item.customServiceName : null,
-            employeeId: item.employeeId && item.employeeId !== "none" ? item.employeeId : null,
-            referrerId: referrerId && referrerId !== "none" ? referrerId : null,
-            referrerCommission: referrerCommission ? parseFloat(referrerCommission) : null,
-            payReferrer: payReferrer && referrerCommission && parseFloat(referrerCommission) > 0,
+          employeeId: item.employeeId && item.employeeId !== "none" ? item.employeeId : null,
+          referrerId: referrerId && referrerId !== "none" ? referrerId : null,
+          referrerCommission: referrerCommission ? parseFloat(referrerCommission) : null,
+          payReferrer: payReferrer && referrerCommission && parseFloat(referrerCommission) > 0,
           totalPrice: parseFloat(item.price),
           employeeProfit: item.employeeProfit ? parseFloat(item.employeeProfit) : 0,
           deadline: deadline || null,
@@ -340,53 +330,19 @@ export function MultiServiceOrderForm({
 
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
           <div className="space-y-6 py-4 overflow-y-auto flex-1">
-            {/* Student Selection */}
             <div>
               <Label>الطالب *</Label>
-              <Combobox
-                items={students.map((s) => s.id)}
+              <SearchableSelect
+                options={students.map((s) => ({ value: s.id, label: s.name }))}
                 value={studentId}
                 onValueChange={(value) => {
                   setStudentId(value ?? "");
-                  setStudentSearch("");
                 }}
-              >
-                <ComboboxInput 
-                  placeholder="اختر الطالب"
-                  value={studentId ? (students.find((s) => s.id === studentId)?.name || "") : studentSearch}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    const searchValue = e.target.value;
-                    setStudentSearch(searchValue); 
-                    if (studentId) {
-                      setStudentId("");
-                    }
-                  }}
-                />
-                <ComboboxContent>
-                  <ComboboxList>
-                    {(() => {
-                      const filteredStudents = students.filter((student) => 
-                        !studentSearch || 
-                        student.name.toLowerCase().includes(studentSearch.toLowerCase())
-                      );
-                      return filteredStudents.length === 0 ? (
-                        <div className="py-6 text-center text-sm text-muted-foreground">لا يوجد طلاب</div>
-                      ) : (
-                        filteredStudents.map((student) => (
-                          <ComboboxItem 
-                            key={student.id} 
-                            value={student.id}
-                          >
-                            {student.name}
-                          </ComboboxItem>
-                        ))
-                      );
-                    })()}
-                  </ComboboxList>
-                </ComboboxContent>
-              </Combobox>
+                placeholder="اختر الطالب"
+                emptyMessage="لا يوجد طلاب"
+              />
             </div>
- 
+
             <div>
               <Label>المندوب (اختياري)</Label>
               <Select value={referrerId} onValueChange={setReferrerId}>
@@ -645,8 +601,8 @@ export function MultiServiceOrderForm({
                                 if (i === numberOfInstallments - 1) {
                                   newInstallments.push(
                                     remaining -
-                                      (numberOfInstallments - 1) *
-                                        installmentAmount
+                                    (numberOfInstallments - 1) *
+                                    installmentAmount
                                   );
                                 } else {
                                   newInstallments.push(installmentAmount);
@@ -695,8 +651,8 @@ export function MultiServiceOrderForm({
                                 if (i === numberOfInstallments - 1) {
                                   newInstallments.push(
                                     remaining -
-                                      (numberOfInstallments - 1) *
-                                        installmentAmount
+                                    (numberOfInstallments - 1) *
+                                    installmentAmount
                                   );
                                 } else {
                                   newInstallments.push(installmentAmount);

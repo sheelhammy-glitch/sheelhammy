@@ -2,8 +2,9 @@
 
 import { Icon } from "@iconify/react";
 import Image from "next/image";
-import Link from "next/link"; 
+import Link from "next/link";
 import aboutImage from "@/assets/about.svg";
+import AnimatedContent from "@/components/animated-content";
 
 const SECTIONS = [
   {
@@ -44,7 +45,7 @@ export function AboutSection() {
           <div className="order-1 lg:order-1">
             <div className="space-y-8">
 
-              <div>
+              <AnimatedContent distance={22} duration={0.7}>
                 <div
                   className="inline-flex items-center gap-2 px-4 py-1 mb-5 rounded-lg border"
                   style={{ backgroundColor: "#ffffff", borderColor: "#0056d2", borderWidth: "2px" }}
@@ -72,26 +73,33 @@ export function AboutSection() {
                 <p className="text-lg md:text-ms text-gray-600 max-w-3xl mx-auto leading-relaxed">
                   منصة أكاديمية متخصصة تقدّم مساعدة احترافية لدعم الطلاب في تنفيذ أعمالهم وفق أعلى المعايير الجامعية
                 </p>
-              </div>
+              </AnimatedContent>
 
               <div className="grid sm:grid-cols-2 gap-x-10 gap-y-8">
                 {SECTIONS.map((s) => (
-                  <div key={s.title} className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-[#EFF6FF] flex items-center justify-center flex-shrink-0">
-                        <Icon icon={s.icon} className="w-5 h-5 text-[#0056d2]" />
+                  <AnimatedContent
+                    key={s.title}
+                    distance={18}
+                    duration={0.6}
+                    delay={SECTIONS.findIndex((x) => x.title === s.title) * 0.06}
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-[#EFF6FF] flex items-center justify-center flex-shrink-0">
+                          <Icon icon={s.icon} className="w-5 h-5 text-[#0056d2]" />
+                        </div>
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">{s.title}</h3>
                       </div>
-                      <h3 className="text-lg font-bold text-gray-900 dark:text-white">{s.title}</h3>
-                    </div>
 
-                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-base md:text-lg">
-                      {s.text}
-                    </p>
-                  </div>
+                      <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-base md:text-lg">
+                        {s.text}
+                      </p>
+                    </div>
+                  </AnimatedContent>
                 ))}
               </div>
 
-              <div className="pt-1">
+              <AnimatedContent distance={16} duration={0.6} delay={0.1} className="pt-1">
                 <Link
                   href="/about-us"
                   className="inline-flex items-center gap-2 text-[#0056d2] font-semibold text-sm hover:gap-3 transition-all duration-300"
@@ -102,11 +110,11 @@ export function AboutSection() {
                     className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1"
                   />
                 </Link>
-              </div>
+              </AnimatedContent>
             </div>
           </div>
 
-          <div className="order-2 lg:order-2">
+          <AnimatedContent distance={26} duration={0.75} className="order-2 lg:order-2">
             <div className="relative p-4 lg:p-6">
               <div className="absolute top-0 right-0 w-64 h-64 bg-[#0056d2]/10 rounded-full blur-3xl -z-10" />
               <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#0056d2]/5 rounded-full blur-3xl -z-10" />
@@ -123,7 +131,7 @@ export function AboutSection() {
                 </div>
               </div>
             </div>
-          </div>
+          </AnimatedContent>
         </div>
       </div>
     </section>

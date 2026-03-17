@@ -1,8 +1,9 @@
 import React from 'react'
 import type { Metadata } from 'next'
-import { ContactHero } from './_components/contact-hero' 
+import { ContactHero } from './_components/contact-hero'
 import { generateSEOMetadata } from '@/lib/seo/metadata'
 import { ContactForm } from './_components/contact-form';
+import AnimatedContent from '@/components/animated-content'
 
 export async function generateMetadata(): Promise<Metadata> {
   return generateSEOMetadata({
@@ -30,8 +31,12 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function ContactPage() {
   return (
     <main>
-      <ContactHero />
-      <ContactForm />
+      <AnimatedContent distance={22} duration={0.7}>
+        <ContactHero />
+      </AnimatedContent>
+      <AnimatedContent distance={18} duration={0.65} delay={0.06}>
+        <ContactForm />
+      </AnimatedContent>
     </main>
   )
 }

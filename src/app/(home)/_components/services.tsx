@@ -5,6 +5,7 @@ import { Icon } from "@iconify/react";
 import Image from "next/image";
 import Link from "next/link";
 import DetailsMoldals from "@/app/(main)/services/_components/detailsMoldals";
+import AnimatedContent from "@/components/animated-content";
 
 type Service = {
   id: string;
@@ -106,7 +107,7 @@ export function ServicesSection() {
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
         {/* العنوان */}
-        <div className="text-center mb-16">
+        <AnimatedContent distance={22} duration={0.7} className="text-center mb-16">
           <div
             className="inline-flex items-center gap-2 px-5 py-1 mb-5 rounded-lg border-2"
             style={{
@@ -141,8 +142,8 @@ export function ServicesSection() {
           <p className="text-base text-gray-500 max-w-2xl mx-auto leading-relaxed">
             نوفر لك مساعدة أكاديمية شاملة بمعايير موثوقة وتسليم منظم وتجربة تواصل سهلة.
           </p>
-        </div>
- 
+        </AnimatedContent>
+
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7 mb-14">
             {[1, 2, 3].map((i) => (
@@ -163,122 +164,129 @@ export function ServicesSection() {
               const isHovered = hoveredIndex === index;
 
               return (
-                <div
+                <AnimatedContent
                   key={service.id ?? index}
-                  onMouseEnter={() => setHoveredIndex(index)}
-                  onMouseLeave={() => setHoveredIndex(null)}
-                  className="group relative flex flex-col bg-white rounded-3xl overflow-hidden
-                    border border-gray-100
-                    shadow-[0_4px_24px_rgba(0,0,0,0.06)]
-                    hover:shadow-[0_16px_48px_rgba(0,86,210,0.14)]
-                    transition-all duration-500 hover:-translate-y-1"
+                  distance={18}
+                  duration={0.6}
+                  delay={index * 0.08}
+                  className="h-full"
                 >
-               
-                  <div className="relative h-44 w-full overflow-hidden bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-                    <Image
-                      src={service.image || DEFAULT_IMAGE}
-                      alt={service.title}
-                      fill
-                      className="object-contain w-full h-full transition-transform duration-700 group-hover:scale-105"
-                      sizes="(max-width:768px)100vw,(max-width:1200px)50vw,33vw"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-white/80 via-white/25 to-transparent pointer-events-none" />
+                  <div
+                    onMouseEnter={() => setHoveredIndex(index)}
+                    onMouseLeave={() => setHoveredIndex(null)}
+                    className="group relative flex flex-col bg-white rounded-3xl overflow-hidden
+                      border border-gray-100
+                      shadow-[0_4px_24px_rgba(0,0,0,0.06)]
+                      hover:shadow-[0_16px_48px_rgba(0,86,210,0.14)]
+                      transition-all duration-500 hover:-translate-y-1 h-full"
+                  >
 
-                 
-                    {service.category?.name && (
-                      <div
-                        className="absolute top-4 right-4 z-10 flex items-center gap-2 px-3 py-1.5 rounded-xl border shadow-sm"
-                        style={{
-                          background: "rgba(255,255,255,0.88)",
-                          borderColor: `${PRIMARY}22`,
-                          backdropFilter: "blur(10px)",
-                        }}
-                      >
-                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: PRIMARY }} />
-                        <span className="text-xs font-extrabold text-gray-900">{service.category.name}</span>
-                      </div>
-                    )} 
-              
-         
-                  </div>
- 
-                  <div className="flex-1 flex flex-col px-2 py-2 gap-4">
-                 
+                    <div className="relative h-44 w-full overflow-hidden bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+                      <Image
+                        src={service.image || DEFAULT_IMAGE}
+                        alt={service.title}
+                        fill
+                        className="object-contain w-full h-full transition-transform duration-700 group-hover:scale-105"
+                        sizes="(max-width:768px)100vw,(max-width:1200px)50vw,33vw"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-white/80 via-white/25 to-transparent pointer-events-none" />
+
+
+                      {service.category?.name && (
+                        <div
+                          className="absolute top-4 right-4 z-10 flex items-center gap-2 px-3 py-1.5 rounded-xl border shadow-sm"
+                          style={{
+                            background: "rgba(255,255,255,0.88)",
+                            borderColor: `${PRIMARY}22`,
+                            backdropFilter: "blur(10px)",
+                          }}
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full" style={{ background: PRIMARY }} />
+                          <span className="text-xs font-extrabold text-gray-900">{service.category.name}</span>
+                        </div>
+                      )}
+
+
+                    </div>
+
+                    <div className="flex-1 flex flex-col px-2 py-2 gap-4">
+
                       <p className="text-xs font-extrabold " style={{ color: PRIMARY }}>
                         {service.category?.name ?? "خدمة أكاديمية"}
                       </p>
                       <h3 className="text-xl font-extrabold text-black leading-tight line-clamp-2">{service.title}</h3>
-                   
-                    <p className="text-sm text-gray-500 leading-relaxed line-clamp-2">{service.description}</p>
- 
-                    <div className="grid grid-cols-2 gap-x-3 gap-y-2">
-                      {features.slice(0, 4).map((feat, fi) => (
-                        <div key={fi} className="flex items-start gap-2">
-                          <span
-                            className="mt-[2px] w-4.5 h-4.5 rounded-md flex items-center justify-center flex-shrink-0"
-                            style={{ background: `${PRIMARY}18` }}
-                          >
-                            <Icon icon="solar:check-circle-bold" className="w-3.5 h-3.5" style={{ color: PRIMARY }} />
-                          </span>
-                          <span className="text-[12.5px] text-gray-600 leading-snug line-clamp-2">{feat}</span>
-                        </div>
-                      ))}
-                    </div>
 
-                    <div className="border-t border-gray-100 mt-auto" />
- 
-                    <div className="flex items-center gap-2.5">
-                      <Link
-                        href="/contact-us"
-                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white
+                      <p className="text-sm text-gray-500 leading-relaxed line-clamp-2">{service.description}</p>
+
+                      <div className="grid grid-cols-2 gap-x-3 gap-y-2">
+                        {features.slice(0, 4).map((feat, fi) => (
+                          <div key={fi} className="flex items-start gap-2">
+                            <span
+                              className="mt-[2px] w-4.5 h-4.5 rounded-md flex items-center justify-center flex-shrink-0"
+                              style={{ background: `${PRIMARY}18` }}
+                            >
+                              <Icon icon="solar:check-circle-bold" className="w-3.5 h-3.5" style={{ color: PRIMARY }} />
+                            </span>
+                            <span className="text-[12.5px] text-gray-600 leading-snug line-clamp-2">{feat}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="border-t border-gray-100 mt-auto" />
+
+                      <div className="flex items-center gap-2.5">
+                        <Link
+                          href="/contact-us"
+                          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white
                           transition-all duration-200 hover:opacity-95 hover:shadow-lg"
-                        style={{
-                          background: `linear-gradient(135deg, ${PRIMARY}, #0047b3)`,
-                          boxShadow: `0 6px 18px ${PRIMARY}35`,
-                        }}
-                      >
-                        <Icon icon="solar:phone-calling-bold" className="w-4 h-4" />
-                        اطلب الخدمة
-                      </Link>
+                          style={{
+                            background: `linear-gradient(135deg, ${PRIMARY}, #0047b3)`,
+                            boxShadow: `0 6px 18px ${PRIMARY}35`,
+                          }}
+                        >
+                          <Icon icon="solar:phone-calling-bold" className="w-4 h-4" />
+                          اطلب الخدمة
+                        </Link>
 
-                      <button
-                        type="button"
-                        onClick={() => setOpenIndex(index)}
-                        className="flex cursor-pointer items-center justify-center w-11 h-11 rounded-xl border-2 transition-all duration-200 flex-shrink-0"
-                        style={{
-                          borderColor: `${PRIMARY}30`,
-                          color: PRIMARY,
-                          background: `${PRIMARY}08`,
-                        }}
-                        onMouseEnter={(e) => {
-                          (e.currentTarget as HTMLButtonElement).style.background = PRIMARY;
-                          (e.currentTarget as HTMLButtonElement).style.borderColor = PRIMARY;
-                          (e.currentTarget as HTMLButtonElement).style.color = "#fff";
-                        }}
-                        onMouseLeave={(e) => {
-                          (e.currentTarget as HTMLButtonElement).style.background = `${PRIMARY}08`;
-                          (e.currentTarget as HTMLButtonElement).style.borderColor = `${PRIMARY}30`;
-                          (e.currentTarget as HTMLButtonElement).style.color = PRIMARY;
-                        }}
-                        aria-label="التفاصيل"
-                      >
-                        <Icon icon="solar:eye-bold" className="w-5 h-5" />
-                      </button>
+                        <button
+                          type="button"
+                          onClick={() => setOpenIndex(index)}
+                          className="flex cursor-pointer items-center justify-center w-11 h-11 rounded-xl border-2 transition-all duration-200 flex-shrink-0"
+                          style={{
+                            borderColor: `${PRIMARY}30`,
+                            color: PRIMARY,
+                            background: `${PRIMARY}08`,
+                          }}
+                          onMouseEnter={(e) => {
+                            (e.currentTarget as HTMLButtonElement).style.background = PRIMARY;
+                            (e.currentTarget as HTMLButtonElement).style.borderColor = PRIMARY;
+                            (e.currentTarget as HTMLButtonElement).style.color = "#fff";
+                          }}
+                          onMouseLeave={(e) => {
+                            (e.currentTarget as HTMLButtonElement).style.background = `${PRIMARY}08`;
+                            (e.currentTarget as HTMLButtonElement).style.borderColor = `${PRIMARY}30`;
+                            (e.currentTarget as HTMLButtonElement).style.color = PRIMARY;
+                          }}
+                          aria-label="التفاصيل"
+                        >
+                          <Icon icon="solar:eye-bold" className="w-5 h-5" />
+                        </button>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* خط سفلي موحد */}
-                  <div
-                    className="absolute bottom-0 inset-x-0 h-[3px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-b-3xl"
-                    style={{ background: `linear-gradient(to left, transparent, ${PRIMARY}, transparent)` }}
-                  />
-                </div>
+                    {/* خط سفلي موحد */}
+                    <div
+                      className="absolute bottom-0 inset-x-0 h-[3px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-b-3xl"
+                      style={{ background: `linear-gradient(to left, transparent, ${PRIMARY}, transparent)` }}
+                    />
+                  </div>
+                </AnimatedContent>
               );
             })}
           </div>
         )}
- 
-        <div className="flex justify-center">
+
+        <AnimatedContent distance={16} duration={0.6} delay={0.08} className="flex justify-center">
           <Link
             href="/services"
             className="group relative inline-flex items-center gap-3 px-7 py-2.5 rounded-2xl font-extrabold text-sm
@@ -304,7 +312,7 @@ export function ServicesSection() {
               <Icon icon="solar:arrow-left-bold" className="w-4 h-4" />
             </span>
           </Link>
-        </div>
+        </AnimatedContent>
       </div>
 
       {/* MODAL */}

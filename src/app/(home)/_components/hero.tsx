@@ -7,6 +7,7 @@ import Image from "next/image";
 import hero1 from "@/assets/sliderone.webp";
 import hero2 from "@/assets/slidertwo.webp";
 import hero3 from "@/assets/sliderthree.webp";
+import AnimatedContent from "@/components/animated-content";
 
 const SLIDES = [
   {
@@ -76,14 +77,14 @@ export function HeroSection() {
       dir="rtl"
       className="relative min-h-[100vh] flex items-center overflow-hidden pt-10 bg-gradient-to-br from-blue-50 via-blue-100 to-blue-200 dark:from-gray-900 dark:via-blue-950 dark:to-gray-900"
     >
-     
+
       <div className="absolute inset-0 z-0 bg-gradient-to-br from-[#0056d2]/10 via-[#0056d2]/5 to-transparent" />
 
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-        
-          <div className="relative hidden lg:block order-2">
+
+          <AnimatedContent distance={28} duration={0.8} ease="power3.out" className="relative hidden lg:block order-2">
             <div className="relative w-full h-[475px] overflow-hidden">
               {slides.map((slide, index) => (
                 <div
@@ -103,16 +104,16 @@ export function HeroSection() {
                 </div>
               ))}
             </div>
-          </div>
-          
+          </AnimatedContent>
+
           {/* Text */}
-          <div className="text-right order-1 relative">
+          <AnimatedContent distance={22} duration={0.75} ease="power3.out" className="text-right order-1 relative">
             {slides.map((slide, index) => (
               <div
                 key={index}
                 className={`transition-all duration-700 ${current === index
-                    ? "opacity-100 relative z-10"
-                    : "opacity-0 absolute inset-0 z-0 pointer-events-none"
+                  ? "opacity-100 relative z-10"
+                  : "opacity-0 absolute inset-0 z-0 pointer-events-none"
                   }`}
               >
                 <div
@@ -185,9 +186,9 @@ export function HeroSection() {
                 </div>
               </div>
             ))}
-          </div>
+          </AnimatedContent>
         </div>
-         
+
         <div className="flex justify-center gap-2 mt-8">
           {slides.map((_, i) => (
             <button

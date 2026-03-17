@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import scope from "@/assets/scope.svg";
 import CountriesGlobeModal from "@/components/common/CountriesGlobeModal";
+import AnimatedContent from "@/components/animated-content";
 
 export function ScopeSection() {
   const [openCountries, setOpenCountries] = useState(false);
@@ -16,7 +17,7 @@ export function ScopeSection() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Text Content */}
-          <div className="space-y-8">
+          <AnimatedContent distance={22} duration={0.7} className="space-y-8">
             <div className="text-right mb-12">
               <div
                 className="inline-flex items-center gap-2 px-4 py-1 mb-5 rounded-lg border"
@@ -132,9 +133,9 @@ export function ScopeSection() {
                 </Link>
               </Button>
             </div>
-          </div>
- 
-          <div className="relative order-first lg:order-last flex justify-center">
+          </AnimatedContent>
+
+          <AnimatedContent distance={26} duration={0.75} className="relative order-first lg:order-last flex justify-center">
             <div className="relative">
               <Image
                 src={scope}
@@ -161,7 +162,7 @@ export function ScopeSection() {
                 />
               </button>
             </div>
-          </div>
+          </AnimatedContent>
         </div>
       </div>
 

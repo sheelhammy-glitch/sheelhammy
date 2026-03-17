@@ -1,5 +1,8 @@
+"use client";
+
 import { Icon } from "@iconify/react";
 import React from "react";
+import AnimatedContent from "@/components/animated-content";
 
 export default function Benfits() {
   const FEATURES = [
@@ -26,8 +29,13 @@ export default function Benfits() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {FEATURES.map((feature, index) => (
-            <div key={index} className="relative">
-
+            <AnimatedContent
+              key={index}
+              distance={18}
+              duration={0.6}
+              delay={index * 0.08}
+              className="relative"
+            >
               <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
                 <div
                   className="absolute inset-[-2px] rounded-2xl animate-spin"
@@ -47,7 +55,6 @@ export default function Benfits() {
                 "
               >
                 <div className="flex items-start gap-4">
-
                   <div className="flex-shrink-0 w-12 h-12 rounded-xl 
                   flex items-center justify-center bg-[#0056d2]">
                     <Icon
@@ -63,13 +70,10 @@ export default function Benfits() {
                     <p className="text-base text-gray-700 mt-1 leading-snug">
                       {feature.subtitle}
                     </p>
-
                   </div>
-
                 </div>
               </div>
-
-            </div>
+            </AnimatedContent>
           ))}
         </div>
       </div>

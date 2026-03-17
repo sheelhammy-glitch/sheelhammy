@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Icon } from "@iconify/react";
+import AnimatedContent from "@/components/animated-content";
 
 import logo from "@/assets/logo.svg";
 import arabbank from "@/assets/Arabbank.png";
@@ -47,7 +48,7 @@ const footerLinks = {
     },
   ],
   company: [
-{ name: "المدونة العلمية", href: "/blog" },
+    { name: "المدونة العلمية", href: "/blog" },
     { name: "من نحن", href: "/about-us" },
     { name: "نماذج الأعمال", href: "/samples" },
     { name: "طرق الدفع", href: "/payment" },
@@ -119,7 +120,7 @@ export function Footer() {
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8 sm:gap-10 lg:gap-12">
           {/* Brand */}
-          <div className="sm:col-span-2 lg:col-span-4">
+          <AnimatedContent distance={18} duration={0.65} className="sm:col-span-2 lg:col-span-4">
             <Link href="/" className="flex items-center gap-3">
               <Image src={logo} alt="شيل همي" width={44} height={44} />
               <span className="text-xl font-extrabold">
@@ -147,8 +148,8 @@ export function Footer() {
                 </a>
               ))}
             </div>
-          </div>
-          <div className="sm:col-span-1 lg:col-span-3">
+          </AnimatedContent>
+          <AnimatedContent distance={18} duration={0.65} delay={0.06} className="sm:col-span-1 lg:col-span-3">
             <SectionTitle>تواصل معنا</SectionTitle>
             <div className="space-y-4">
               {footerLinks.contact.map((item) => (
@@ -162,10 +163,10 @@ export function Footer() {
                 </FooterItem>
               ))}
             </div>
-          </div>
+          </AnimatedContent>
 
 
-          <div className="sm:col-span-1 lg:col-span-2">
+          <AnimatedContent distance={18} duration={0.65} delay={0.12} className="sm:col-span-1 lg:col-span-2">
             <SectionTitle>روابط سريعة</SectionTitle>
             <ul className="space-y-3">
               {footerLinks.company.map((link) => (
@@ -179,9 +180,9 @@ export function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
+          </AnimatedContent>
 
-          <div className="sm:col-span-2 lg:col-span-3">
+          <AnimatedContent distance={18} duration={0.65} delay={0.18} className="sm:col-span-2 lg:col-span-3">
             <SectionTitle>السياسات</SectionTitle>
             <ul className="space-y-3">
               {footerLinks.policies.map((link) => (
@@ -195,36 +196,37 @@ export function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
+          </AnimatedContent>
         </div>
       </div>
       <div className="border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col md:flex-row gap-4 sm:gap-6 items-center justify-between">
-          <p className="text-white/50 text-xs sm:text-sm md:text-base text-center md:text-right break-words">
-            © {new Date().getFullYear()} شيل همي — جميع الحقوق محفوظة
-          </p>
+        <AnimatedContent distance={14} duration={0.6} delay={0.06}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col md:flex-row gap-4 sm:gap-6 items-center justify-between">
+            <p className="text-white/50 text-xs sm:text-sm md:text-base text-center md:text-right break-words">
+              © {new Date().getFullYear()} شيل همي — جميع الحقوق محفوظة
+            </p>
 
-
-          <div className="flex flex-wrap gap-2 sm:gap-3 justify-center max-w-full">
-            {paymentMethods.map((method) => (
-              <div
-                key={method.name}
-                title={method.name}
-                className="h-8 w-12 sm:h-10 sm:w-16 rounded-xl p-1.5 sm:p-2 flex items-center justify-center flex-shrink-0
-                           border border-white/10 bg-white/5 backdrop-blur
-                           hover:bg-white/10 hover:border-white/20 transition"
-              >
-                <Image
-                  src={method.image}
-                  alt={method.name}
-                  width={56}
-                  height={28}
-                  className="object-contain opacity-90 w-full h-full"
-                />
-              </div>
-            ))}
+            <div className="flex flex-wrap gap-2 sm:gap-3 justify-center max-w-full">
+              {paymentMethods.map((method) => (
+                <div
+                  key={method.name}
+                  title={method.name}
+                  className="h-8 w-12 sm:h-10 sm:w-16 rounded-xl p-1.5 sm:p-2 flex items-center justify-center flex-shrink-0
+                             border border-white/10 bg-white/5 backdrop-blur
+                             hover:bg-white/10 hover:border-white/20 transition"
+                >
+                  <Image
+                    src={method.image}
+                    alt={method.name}
+                    width={56}
+                    height={28}
+                    className="object-contain opacity-90 w-full h-full"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        </AnimatedContent>
       </div>
     </footer>
   );

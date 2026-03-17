@@ -66,7 +66,7 @@ export function HeaderClient() {
     navigation.forEach((item) => {
       try {
         router.prefetch?.(item.href);
-      } catch {}
+      } catch { }
     });
   }, [router]);
 
@@ -134,11 +134,10 @@ export function HeaderClient() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "bg-white/70 dark:bg-gray-900/70 backdrop-blur-lg shadow-sm border-b border-gray-100 dark:border-gray-800"
-          : "bg-transparent backdrop-blur-sm"
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
+        ? "bg-white/70 dark:bg-gray-900/70 backdrop-blur-lg shadow-sm border-b border-gray-100 dark:border-gray-800"
+        : "bg-transparent backdrop-blur-sm"
+        }`}
     >
       {/* ✅ Top Loading Bar */}
       <div className="absolute top-0 left-0 right-0 h-[2px] overflow-hidden">
@@ -184,11 +183,10 @@ export function HeaderClient() {
                   key={item.name}
                   onClick={() => handleNavClick(item.href)}
                   disabled={isNavigating}
-                  className={`relative cursor-pointer px-4 py-2 rounded-xl text-md font-medium transition ${
-                    active
-                      ? "bg-[#EEF5FF]"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
-                  } ${isNavigating ? "opacity-70 cursor-not-allowed" : ""}`}
+                  className={`relative cursor-pointer px-4 py-2 rounded-xl text-md font-medium transition ${active
+                    ? "bg-[#EEF5FF]"
+                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                    } ${isNavigating ? "opacity-70 cursor-not-allowed" : ""}`}
                   style={{ color: active ? BRAND : undefined }}
                 >
                   {item.name}
@@ -249,7 +247,7 @@ export function HeaderClient() {
 
         {/* MOBILE MENU */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden pb-6">
+          <div className="lg:hidden pb-6 animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-200">
             <div className="flex flex-col gap-2 bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-xl border border-gray-100 dark:border-gray-800 mt-4">
               {navigation.map((item) => {
                 const active = isActive(item.href);
@@ -258,11 +256,10 @@ export function HeaderClient() {
                     key={item.name}
                     onClick={() => handleNavClick(item.href)}
                     disabled={isNavigating}
-                    className={`text-right cursor-pointer px-4 py-3 rounded-xl text-sm font-medium transition ${
-                      active
-                        ? "bg-[#EEF5FF]"
-                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
-                    } ${isNavigating ? "opacity-70 cursor-not-allowed" : ""}`}
+                    className={`text-right cursor-pointer px-4 py-3 rounded-xl text-sm font-medium transition ${active
+                      ? "bg-[#EEF5FF]"
+                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                      } ${isNavigating ? "opacity-70 cursor-not-allowed" : ""}`}
                     style={{ color: active ? BRAND : undefined }}
                   >
                     {item.name}

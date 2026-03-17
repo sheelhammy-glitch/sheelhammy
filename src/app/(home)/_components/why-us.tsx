@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { createPortal } from "react-dom";
 import { Icon } from "@iconify/react";
 import DetailsModalWhyUS from "@/components/common/DetailsModalWhyUS";
+import AnimatedContent from "@/components/animated-content";
 
 export const THEME = {
   primary: "#0056d2",
@@ -12,7 +12,7 @@ export const THEME = {
   white: "#ffffff",
 };
 
- export const FEATURES = [
+export const FEATURES = [
   {
     icon: "qlementine-icons:quality-4-16",
     title: "معايير جودة دقيقة",
@@ -98,7 +98,7 @@ export const THEME = {
     },
   },
 ];
- 
+
 
 
 
@@ -106,14 +106,11 @@ export const THEME = {
 export function WhyUsSection() {
   const [open, setOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
 
   const selectedFeature = useMemo(() => {
     if (selectedIndex === null) return null;
     return FEATURES[selectedIndex] ?? null;
   }, [selectedIndex]);
-
-  useEffect(() => setIsVisible(true), []);
 
   const openModal = (index: number) => {
     setSelectedIndex(index);
@@ -130,8 +127,8 @@ export function WhyUsSection() {
       <div className="absolute inset-0 bg-white dark:bg-slate-950" />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
-       
-        <div className="text-center mb-16">
+
+        <AnimatedContent distance={22} duration={0.7} className="text-center mb-16">
           <div
             className="inline-flex items-center gap-2 px-4 py-1 mb-5 rounded-lg border"
             style={{ backgroundColor: THEME.white, borderColor: THEME.primary, borderWidth: "2px" }}
@@ -156,20 +153,19 @@ export function WhyUsSection() {
           <p className="text-lg md:text-base text-black/70 max-w-3xl mx-auto leading-relaxed">
             ستة ركائز تجعلنا شريكك الموثوق في رحلة النجاح الأكاديمي والمهني
           </p>
-        </div>
+        </AnimatedContent>
 
         {/* Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
           {FEATURES.map((feature, index) => (
-            <div
+            <AnimatedContent
               key={index}
-              className={[
-                "group relative transition-all duration-700",
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10",
-              ].join(" ")}
-              style={{ transitionDelay: `${index * 90}ms` }}
+              distance={18}
+              duration={0.6}
+              delay={index * 0.07}
+              className="h-full"
             >
-              <div className="relative h-full">
+              <div className="group relative h-full">
                 <div
                   className="absolute -inset-0.5 rounded-[28px] opacity-0 group-hover:opacity-[0.10] blur-xl transition-all duration-500"
                   style={{ background: `linear-gradient(135deg, ${THEME.primary}, ${THEME.black})` }}
@@ -206,7 +202,7 @@ export function WhyUsSection() {
                   />
 
                   <div className="relative mb-4">
-                    <div className="flex items-start gap-4"> 
+                    <div className="flex items-start gap-4">
                       <div className="relative">
                         <div
                           className="absolute inset-0 rounded-2xl blur-lg opacity-25 group-hover:opacity-35 transition-opacity duration-500"
@@ -221,7 +217,6 @@ export function WhyUsSection() {
                       </div>
 
                       <div className="flex-1 pt-1">
-                        {/* ✅ نص أساسي أسود + عند hover يصير 0056d2 */}
                         <h3 className="text-lg font-extrabold text-[#000000] dark:text-white transition-colors duration-300 group-hover:text-[#0056d2]">
                           {feature.title}
                         </h3>
@@ -253,10 +248,10 @@ export function WhyUsSection() {
                   </div>
                 </div>
               </div>
-            </div>
+            </AnimatedContent>
           ))}
         </div>
- 
+
         <DetailsModalWhyUS open={open} onClose={closeModal} feature={selectedFeature} />
       </div>
     </section>

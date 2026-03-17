@@ -1,9 +1,11 @@
 import React from 'react'
+import type { Metadata } from 'next'
 import { ServicesHero } from './_components/services-hero'
 import { ServicesList } from './_components/services-list'
 import { generateSEOMetadata } from '@/lib/seo/metadata'
+import AnimatedContent from '@/components/animated-content'
 
-export async function generateMetadata() {
+export async function generateMetadata(): Promise<Metadata> {
   return generateSEOMetadata({
     title: "خدماتنا - شيل همّي",
     description: "استكشف خدمات شيل همّي الأكاديمية: حل الأسايمنت، إعداد الأبحاث، مشاريع التخرج، التقارير والتدقيق اللغوي لجميع التخصصات في الوطن العربي بجودة عالية.",
@@ -31,8 +33,12 @@ export async function generateMetadata() {
 export default function ServicesPage() {
   return (
     <main>
-      <ServicesHero />
-      <ServicesList />
+      <AnimatedContent distance={22} duration={0.7}>
+        <ServicesHero />
+      </AnimatedContent>
+      <AnimatedContent distance={18} duration={0.65} delay={0.06}>
+        <ServicesList />
+      </AnimatedContent>
 
     </main>
   )

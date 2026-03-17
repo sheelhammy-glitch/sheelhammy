@@ -844,3 +844,130 @@ body {
 .svc-cta.primary:hover { transform:translateY(-1px);box-shadow:0 14px 30px rgba(0,86,210,.28); }
 .svc-cta.secondary { background:#f0f6ff;color:#0056d2;border:1.5px solid #c7dcff; }
 .svc-cta.secondary:hover { transform:translateY(-1px);opacity:.95; }
+
+
+.trc {
+  position: relative;
+  width: 272px; /* أصغر */
+  flex-shrink: 0;
+  margin: 0 8px;
+  border-radius: 18px;
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  background: #ffffff;
+  padding: 18px 18px 14px; /* أصغر */
+  overflow: hidden;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 2px 4px rgba(0, 0, 0, 0.04),
+    0 8px 20px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.35s ease, transform 0.35s ease;
+}
+.trc:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 4px 10px rgba(0, 0, 0, 0.06),
+    0 14px 30px rgba(0, 0, 0, 0.09);
+}
+.trc-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* header */
+.trc-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  position: relative;
+}
+.trc-av {
+  width: 38px; /* أصغر */
+  height: 38px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: white;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  letter-spacing: 0.5px;
+}
+.trc-meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.trc-name {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.trc-role {
+  font-size: 10.5px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+.trc-stars {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+/* فاصل */
+.trc-line {
+  height: 1px;
+  border-radius: 1px;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+/* body */
+.trc-body {
+  position: relative;
+  margin-bottom: 12px;
+}
+.trc-qicon {
+  width: 20px;
+  height: 20px;
+  margin-bottom: 7px;
+  display: block;
+  opacity: 0.7;
+}
+.trc-text {
+  font-size: 12.5px; /* أصغر */
+  color: #475569;
+  line-height: 1.75;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-weight: 400;
+}
+
+/* footer */
+.trc-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* لأنه ما عاد في نص */
+  padding-top: 12px;
+  border-top: 1px solid #f1f5f9;
+  position: relative;
+}
+.trc-dots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}

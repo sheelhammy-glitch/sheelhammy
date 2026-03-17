@@ -1,13 +1,15 @@
 import React from 'react'
+import type { Metadata } from 'next'
 import { AboutHero } from './_components/about-hero'
 import { OurStory } from './_components/our-story'
 import { OurValues } from './_components/our-values'
-import { Stats } from './_components/stats' 
+import { Stats } from './_components/stats'
 import { FAQSection } from '@/app/(home)/_components/faq'
 import { About } from './_components/about'
 import { generateSEOMetadata } from '@/lib/seo/metadata'
+import AnimatedContent from '@/components/animated-content'
 
-export async function generateMetadata() {
+export async function generateMetadata(): Promise<Metadata> {
   return generateSEOMetadata({
     title: "من نحن - شيل همّي",
     description: "تعرف على منصة شيل همّي للخدمات الأكاديمية والطلابية، فريق متخصص يقدم دعمًا احترافيًا للطلاب في الأبحاث، الأسايمنت ومشاريع التخرج في الوطن العربي.",
@@ -35,12 +37,24 @@ export async function generateMetadata() {
 export default function AboutPage() {
   return (
     <main>
-      <AboutHero />
-      <About />
-      <OurStory />
-      <OurValues />
-      <Stats /> 
-      <FAQSection />
+      <AnimatedContent distance={22} duration={0.7}>
+        <AboutHero />
+      </AnimatedContent>
+      <AnimatedContent distance={18} duration={0.65} delay={0.04}>
+        <About />
+      </AnimatedContent>
+      <AnimatedContent distance={18} duration={0.65} delay={0.08}>
+        <OurStory />
+      </AnimatedContent>
+      <AnimatedContent distance={18} duration={0.65} delay={0.12}>
+        <OurValues />
+      </AnimatedContent>
+      <AnimatedContent distance={18} duration={0.65} delay={0.16}>
+        <Stats />
+      </AnimatedContent>
+      <AnimatedContent distance={18} duration={0.65} delay={0.2}>
+        <FAQSection />
+      </AnimatedContent>
 
     </main>
   )

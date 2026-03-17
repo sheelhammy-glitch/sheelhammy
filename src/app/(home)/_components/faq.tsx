@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import FAQRow from "@/components/common/FAQRow";
+import AnimatedContent from "@/components/animated-content";
 
 export type FAQItem = {
   q: string;
@@ -19,7 +20,7 @@ type DBFAQ = {
 const WHATSAPP_NUMBER = "962781858647";
 const WHATSAPP_TEXT = encodeURIComponent("مرحبًا، لدي استفسار بخصوص خدمات شيل همّي.");
 const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_TEXT}`;
- 
+
 const FALLBACK_FAQS: FAQItem[] = [
   {
     q: "كيف أقدّم طلب خدمة على شيل همّي؟",
@@ -47,18 +48,18 @@ export function FAQSection() {
           throw new Error("Failed to fetch FAQs");
         }
         const data: DBFAQ[] = await res.json();
-         
+
         const transformedFAQs: FAQItem[] = Array.isArray(data)
           ? data.map((faq) => ({
-              q: faq.question,
-              a: faq.answer,
-              category: "عام", 
-            }))
+            q: faq.question,
+            a: faq.answer,
+            category: "عام",
+          }))
           : [];
-         
+
         setFaqs(transformedFAQs.length > 0 ? transformedFAQs : FALLBACK_FAQS);
       } catch (error) {
-        console.error("Error fetching FAQs:", error); 
+        console.error("Error fetching FAQs:", error);
         setFaqs(FALLBACK_FAQS);
       } finally {
         setIsLoading(false);
@@ -74,7 +75,7 @@ export function FAQSection() {
       dir="rtl"
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl relative z-10">
-        <div className="text-center mb-16">
+        <AnimatedContent distance={22} duration={0.7} className="text-center mb-16">
           <div
             className="inline-flex items-center gap-2 px-4 py-1 mb-5 rounded-lg border"
             style={{
@@ -116,7 +117,7 @@ export function FAQSection() {
           <p className="text-lg md:text-ms text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
             إجابات سريعة ومباشرة لأهم استفساراتك
           </p>
-        </div>
+        </AnimatedContent>
 
         {isLoading ? (
           <div className="grid md:grid-cols-2 gap-3 max-w-5xl mx-auto mb-12">
@@ -140,17 +141,23 @@ export function FAQSection() {
         ) : (
           <div className="grid md:grid-cols-2 gap-3 max-w-5xl mx-auto mb-12">
             {faqs.map((item, i) => (
-              <FAQRow
+              <AnimatedContent
                 key={`faq-${i}`}
-                item={item}
-                isOpen={openIndex === i}
-                onToggle={() => setOpenIndex(openIndex === i ? null : i)}
-              />
+                distance={16}
+                duration={0.55}
+                delay={i * 0.04}
+              >
+                <FAQRow
+                  item={item}
+                  isOpen={openIndex === i}
+                  onToggle={() => setOpenIndex(openIndex === i ? null : i)}
+                />
+              </AnimatedContent>
             ))}
           </div>
         )}
 
-        <div className="mt-12 text-center">
+        <AnimatedContent distance={16} duration={0.6} delay={0.08} className="mt-12 text-center">
           <a
             href={WHATSAPP_LINK}
             target="_blank"
@@ -184,7 +191,7 @@ export function FAQSection() {
 
             <Icon icon="solar:arrow-left-bold" className="w-3.5 h-3.5 opacity-90" />
           </a>
-        </div>
+        </AnimatedContent>
 
 
       </div>
